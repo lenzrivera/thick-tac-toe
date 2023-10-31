@@ -4,7 +4,7 @@
     <div class="tile o"></div>
     <div class="tile covered"></div>
 
-    {#each [...Array(5 * 5 - 3)] as _}
+    {#each [...Array(31 * 31 - 3)] as _}
       <div class="tile"></div>
     {/each}
   </div>
@@ -39,14 +39,23 @@
 
 <style>
   .board {
-    --pan-x: 0%;
-    --pan-y: 0%;
-    --grid-count: 5;
-    --tile-size: 143.04px;
+    --grid-count: 31;
+    --visible-tile-count: 5;
+    --pan-x: 0;
+    --pan-y: 0;
+    --zoom-scale: 0;
 
     position: fixed;
     inset: 0;
     overflow: hidden;
+
+    /* Scale such that only the supposedly visible region of the board is shown. */
+    --DEFAULT-SCALE: 100% * var(--grid-count) / var(--visible-tile-count);
+
+    /* Lerp from --zoom-scale: 0 (normal view) to 1 (all zoomed out). */
+    scale: calc(
+      var(--DEFAULT-SCALE) + var(--zoom-scale) * (100% - var(--DEFAULT-SCALE))
+    );
   }
 
   .pannable_board {
@@ -56,7 +65,7 @@
     left: 50%;
 
     /* Translate the board's center to its container's center + pan offset. */
-    translate: calc(-50% + var(--pan-x)) calc(-50% + var(--pan-y));
+    translate: calc(-50% + var(--pan-x) * 50%) calc(-50% + var(--pan-y) * 50%);
 
     display: grid;
     grid-template-columns: repeat(var(--grid-count), auto);
@@ -64,6 +73,9 @@
   }
 
   .tile {
+    /* Without transforms, the whole board should fit the screen. */
+    --tile-size: calc(100vmin / var(--grid-count));
+
     position: relative;
 
     width: var(--tile-size);
