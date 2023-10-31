@@ -1,6 +1,10 @@
 <div class="board">
   <div class="pannable_board">
-    {#each [...Array(5 * 5)] as _}
+    <div class="tile x"></div>
+    <div class="tile o"></div>
+    <div class="tile covered"></div>
+
+    {#each [...Array(5 * 5 - 3)] as _}
       <div class="tile"></div>
     {/each}
   </div>
@@ -67,6 +71,33 @@
 
     background: lightgray;
     border: 1px solid black;
+  }
+
+  .tile.x::before,
+  .tile.o::before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+
+    font-size: calc(0.6 * var(--tile-size));
+  }
+
+  .tile.x::before {
+    content: "X";
+  }
+
+  .tile.o::before {
+    content: "O";
+  }
+
+  .tile.covered::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background-color: gray;
   }
 
   .fog {
