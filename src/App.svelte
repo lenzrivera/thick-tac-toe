@@ -1,3 +1,11 @@
+<div class="board">
+  <div class="pannable_board">
+    {#each [...Array(5 * 5)] as _}
+      <div class="tile"></div>
+    {/each}
+  </div>
+</div>
+
 <div class="main_modal">
   <h1>thick-tac-toe</h1>
 
@@ -23,9 +31,44 @@
   </div>
 </div>
 
-<div class="fog"></div>
+<div class="fog hidden"></div>
 
 <style>
+  .board {
+    --pan-x: 0%;
+    --pan-y: 0%;
+    --grid-count: 5;
+    --tile-size: 143.04px;
+
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .pannable_board {
+    /* Position the board's top-left corner to its container's center. */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    /* Translate the board's center to its container's center + pan offset. */
+    translate: calc(-50% + var(--pan-x)) calc(-50% + var(--pan-y));
+
+    display: grid;
+    grid-template-columns: repeat(var(--grid-count), auto);
+    justify-content: center;
+  }
+
+  .tile {
+    position: relative;
+
+    width: var(--tile-size);
+    height: var(--tile-size);
+
+    background: lightgray;
+    border: 1px solid black;
+  }
+
   .fog {
     --visible-radius: 500px;
 
