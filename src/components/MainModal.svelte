@@ -1,5 +1,9 @@
 <script>
   export let joinLink = "";
+
+  function handleJoinLinkCopy() {
+    navigator.clipboard.writeText(joinLink);
+  }
 </script>
 
 <div class="main_modal">
@@ -8,7 +12,9 @@
   <div class="join_info">
     <p>join link:</p>
     <input value={joinLink} readonly />
-    <button><span class="material-symbols-outlined">content_copy</span></button>
+    <button on:click={handleJoinLinkCopy}>
+      <span class="material-symbols-outlined">content_copy</span>
+    </button>
   </div>
 
   <div class="description">
