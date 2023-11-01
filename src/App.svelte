@@ -33,7 +33,7 @@
 
     if (opponentId) {
       resetUrl();
-      $store.gameServer.startConnection(opponentId);
+      $store.gameServer.startGame(opponentId);
     } else {
       showMainModal = true;
     }
