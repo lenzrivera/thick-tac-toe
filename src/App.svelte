@@ -4,7 +4,7 @@
   import { getOpponentIdFromJoinLink } from "./connection/join_link";
   import { store } from "./store";
 
-  import AppView from "./views/AppView.svelte";
+  import MainModal from "./components/MainModal.svelte";
 
   let board;
   let fog;
@@ -111,4 +111,17 @@
   }
 </script>
 
-<AppView />
+<div class="app">
+  {#if showMainModal}
+    <MainModal joinLink={$store.gameServer.joinLink} />
+  {/if}
+</div>
+
+<style>
+  .app {
+    position: fixed;
+    inset: 0;
+
+    background-color: black;
+  }
+</style>
