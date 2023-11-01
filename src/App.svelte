@@ -1,7 +1,7 @@
 <script>
   import { onDestroy, onMount } from "svelte";
 
-  import { getOpponentIdFromJoinLink } from "./connection/join_link";
+  import { getOpponentIdFromJoinLink, resetUrl } from "./connection/join_link";
   import { store } from "./store";
 
   import MainModal from "./components/MainModal.svelte";
@@ -32,6 +32,7 @@
     const opponentId = getOpponentIdFromJoinLink();
 
     if (opponentId) {
+      resetUrl();
       $store.gameServer.startConnection(opponentId);
     } else {
       showMainModal = true;
