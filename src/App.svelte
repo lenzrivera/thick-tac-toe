@@ -40,7 +40,7 @@
   }
 
   function handleGameStart() {
-    fog.coverAll();
+    // fog.coverAll();
     showMainModal = false;
   }
 
