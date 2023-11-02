@@ -37,7 +37,6 @@ export class GameServer extends EventEmitter {
 
     this.instance = new Game();
     this.broadcast("game_start");
-    this.broadcast("game_update", {});
-    // // this.broadcast("game_update", this.instance.tileData);
+    this.broadcast("game_update", this.instance.tileData);
   }
 }
