@@ -5,7 +5,11 @@
   import { store } from "./store";
 
   import MainModal from "./components/MainModal.svelte";
+  import Board from "./components/Board.svelte";
 
+  /**
+   * @type {Board}
+   */
   let board;
   let fog;
   let showMainModal = false;
@@ -113,6 +117,8 @@
 </script>
 
 <div class="app">
+  <Board bind:this={board} />
+
   {#if showMainModal}
     <MainModal joinLink={$store.gameServer.joinLink} />
   {/if}
