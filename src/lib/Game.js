@@ -11,9 +11,17 @@ export const BOARD_SIZE = 31;
  */
 
 export class Game {
-  constructor() {
+  /**
+   * @param {import('../connection/Connection').Connection} connection
+   */
+  constructor(connection) {
+    this.connection = connection;
+
     this.tileContents = Game.genTileContents();
     this.coveredTiles = Game.genRandomCoveredTiles();
+
+    this.connection.broadcast("game_start");
+    this.connection.broadcast("game_update", this.tileData);
   }
 
   /**

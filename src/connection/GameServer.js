@@ -10,10 +10,8 @@ export class GameServer extends EventEmitter {
     this.connection = new Connection();
     this.instance = null;
 
-    this.connection.once("open", () => this.emit("connection_ready"), this);
-    this.connection.messages.on("gs_event", ({ eventName, args }) =>
-      this.emit(eventName, ...args),
-    );
+    this.connection.once("open", this.handleConnectionOpen, this);
+    this.connection.on("message", this.handleConnectionMessage, this);
   }
 
   get selfId() {
@@ -24,19 +22,21 @@ export class GameServer extends EventEmitter {
     return `${location.origin}${location.pathname}?id=${this.selfId}`;
   }
 
-  broadcast(eventName, ...args) {
-    this.connection.send("gs_event", { eventName, args });
-    this.emit(eventName, ...args);
+  handleConnectionOpen() {
+    this.emit("connection_ready");
+  }
+
+  handleConnectionMessage({ msgName, args }) {
+    this.emit(msgName, ...args);
   }
 
   /**
    * @param {string} opponentId
    */
   async startGame(opponentId) {
+    // TODO: Handle connection failure.
     await this.connection.connect(opponentId);
 
-    this.instance = new Game();
-    this.broadcast("game_start");
-    this.broadcast("game_update", this.instance.tileData);
+    this.instance = new Game(this.connection);
   }
 }

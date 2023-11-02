@@ -20,16 +20,19 @@ export class Connection extends EventEmitter {
 
     this.self = new Peer();
     this.peer = null;
-    this.messages = new EventEmitter();
 
     // @ts-ignore
-    this.self.once("open", () => this.emit("open"), this);
+    this.self.once("open", this.handleOpen, this);
     // @ts-ignore
     this.self.on("connection", this.handleConnectionToSelf, this);
   }
 
   get id() {
     return this.self.id;
+  }
+
+  handleOpen() {
+    this.emit("open");
   }
 
   /**
@@ -47,8 +50,17 @@ export class Connection extends EventEmitter {
   /**
    * @param {Message} messageData
    */
-  handleMessageReceive({ msgName, args }) {
-    this.messages.emit(msgName, ...args);
+  handleMessageReceive(messageData) {
+    this.emit("message", messageData);
+  }
+
+  /**
+   * @param {string} msgName
+   * @param  {...any} args
+   */
+  broadcast(msgName, ...args) {
+    this.send(msgName, ...args);
+    this.handleMessageReceive({ msgName, args });
   }
 
   /**
