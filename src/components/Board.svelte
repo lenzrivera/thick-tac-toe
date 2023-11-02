@@ -1,21 +1,41 @@
 <script>
+  import Tile from "./Tile.svelte";
+
+  /**
+   * @type {?import('../lib/Game').TileContent[][]}
+   */
+  let tileContents = null;
+
+  /**
+   * @type {?boolean[][]}
+   */
+  let coveredTiles = null;
+
+  $: flatTileContents = tileContents ? tileContents.flat() : [];
+  $: flatCoveredTiles = coveredTiles ? coveredTiles.flat() : [];
+
+  /**
+   * @param {import('../lib/Game').TileData} tileData
+   */
+  export function updateTileData(tileData) {
+    tileContents = tileData.tileContents;
+    coveredTiles = tileData.coveredTiles;
+  }
 </script>
 
-<div class="board">
+<div
+  class="board"
+  style="--grid-count: {tileContents ? tileContents.length : 0};"
+>
   <div class="pannable_board">
-    <div class="tile x"></div>
-    <div class="tile o"></div>
-    <div class="tile covered"></div>
-
-    {#each [...Array(31 * 31 - 3)] as _}
-      <div class="tile"></div>
+    {#each flatTileContents as content, i}
+      <Tile {content} covered={flatCoveredTiles[i]} />
     {/each}
   </div>
 </div>
 
 <style>
   .board {
-    --grid-count: 31;
     --visible-tile-count: 5;
     --pan-x: 0;
     --pan-y: 0;
@@ -46,45 +66,5 @@
     display: grid;
     grid-template-columns: repeat(var(--grid-count), auto);
     justify-content: center;
-  }
-
-  .tile {
-    /* Without transforms, the whole board should fit the screen. */
-    --tile-size: calc(100vmin / var(--grid-count));
-
-    position: relative;
-
-    width: var(--tile-size);
-    height: var(--tile-size);
-
-    background: lightgray;
-    border: 1px solid black;
-  }
-
-  .tile.x::before,
-  .tile.o::before {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-
-    font-size: calc(0.6 * var(--tile-size));
-  }
-
-  .tile.x::before {
-    content: "X";
-  }
-
-  .tile.o::before {
-    content: "O";
-  }
-
-  .tile.covered::after {
-    content: "";
-
-    position: absolute;
-    inset: 0;
-
-    background-color: gray;
   }
 </style>

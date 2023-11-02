@@ -4,6 +4,12 @@ export const BOARD_SIZE = 31;
  * @typedef {'X'|'O'|null} TileContent
  */
 
+/**
+ * @typedef TileData
+ * @prop {TileContent[][]} tileContents
+ * @prop {boolean[][]} coveredTiles
+ */
+
 export class Game {
   constructor() {
     this.tileContents = Game.genTileContents();
@@ -34,6 +40,9 @@ export class Game {
     return coveredTiles;
   }
 
+  /**
+   * @returns {TileData}
+   */
   get tileData() {
     return {
       tileContents: this.tileContents,
