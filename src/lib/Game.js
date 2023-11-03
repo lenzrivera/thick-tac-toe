@@ -74,10 +74,9 @@ export class Game {
   }
 
   static genPanOffset() {
-    const halfSize = Math.floor(BOARD_SIZE / 2);
-
-    const panX = Math.floor(Math.random() * halfSize);
-    const panY = Math.floor(Math.random() * halfSize);
+    // Random numbers in [-1, 1].
+    const panX = (Math.random() * 2 - 1) / 2;
+    const panY = (Math.random() * 2 - 1) / 2;
 
     return [panX, panY];
   }

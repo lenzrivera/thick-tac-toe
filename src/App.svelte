@@ -66,7 +66,7 @@
     // fog.coverAll();
 
     if ($store.gameServer.selfId === currPlayerId) {
-      // board.setPanOffset(currPanXOffset, currPanYOffset);
+      board.setPanOffset(currPanXOffset, currPanYOffset);
       // fog.coverPart();
     }
   }

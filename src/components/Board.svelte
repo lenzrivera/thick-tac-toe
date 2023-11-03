@@ -28,6 +28,10 @@
     coveredTiles = tileData.coveredTiles;
   }
 
+  export function setPanOffset(x, y) {
+    panOffset = { x, y };
+  }
+
   function getBoardStyle(tileContents, panOffset) {
     return (
       `--grid-count: ${tileContents ? tileContents.length : 0};` +
