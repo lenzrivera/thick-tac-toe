@@ -1,6 +1,8 @@
 <script>
   import Tile from "./Tile.svelte";
 
+  const PAN_VEL = 0.0005;
+
   /**
    * @type {?import('../lib/Game').TileContent[][]}
    */
@@ -10,6 +12,10 @@
    * @type {?boolean[][]}
    */
   let coveredTiles = null;
+
+  let panOffset = { x: 0, y: 0 };
+  let panAnchor = null;
+  let prevPanOffset = null;
 
   $: flatTileContents = tileContents ? tileContents.flat() : [];
   $: flatCoveredTiles = coveredTiles ? coveredTiles.flat() : [];
@@ -21,11 +27,54 @@
     tileContents = tileData.tileContents;
     coveredTiles = tileData.coveredTiles;
   }
+
+  function getBoardStyle(tileContents, panOffset) {
+    return (
+      `--grid-count: ${tileContents ? tileContents.length : 0};` +
+      `--pan-x: ${panOffset.x}; --pan-y: ${panOffset.y};`
+    );
+  }
+
+  /* For panning */
+
+  function clamp(val, min, max) {
+    return Math.max(min, Math.min(val, max));
+  }
+
+  function handleBoardPointerDown({ clientX, clientY }) {
+    panAnchor = { x: clientX, y: clientY };
+    prevPanOffset = { ...panOffset };
+  }
+
+  function handlePointerMove({ clientX, clientY }) {
+    if (!panAnchor || !prevPanOffset) {
+      return;
+    }
+
+    const dx = clientX - panAnchor.x;
+    const dy = clientY - panAnchor.y;
+
+    panOffset = {
+      x: clamp(prevPanOffset.x + dx * PAN_VEL, -1, 1),
+      y: clamp(prevPanOffset.y + dy * PAN_VEL, -1, 1),
+    };
+  }
+
+  function handleBoardPointerUp() {
+    panAnchor = null;
+    prevPanOffset = null;
+  }
 </script>
+
+<svelte:body
+  on:pointermove={handlePointerMove}
+  on:pointerup={handleBoardPointerUp}
+/>
 
 <div
   class="board"
-  style="--grid-count: {tileContents ? tileContents.length : 0};"
+  style={getBoardStyle(tileContents, panOffset)}
+  on:pointerdown={handleBoardPointerDown}
 >
   <div class="pannable_board">
     {#each flatTileContents as content, i}
@@ -37,8 +86,6 @@
 <style>
   .board {
     --visible-tile-count: 5;
-    --pan-x: 0;
-    --pan-y: 0;
     --zoom-scale: 0;
 
     position: absolute;
