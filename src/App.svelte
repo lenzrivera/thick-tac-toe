@@ -4,14 +4,20 @@
   import { getOpponentIdFromJoinLink, resetUrl } from "./connection/join_link";
   import { store } from "./store";
 
-  import MainModal from "./components/MainModal.svelte";
   import Board from "./components/Board.svelte";
+  import Fog from "./components/Fog.svelte";
+  import MainModal from "./components/MainModal.svelte";
 
   /**
    * @type {Board}
    */
   let board;
+
+  /**
+   * @type {Fog}
+   */
   let fog;
+
   let showMainModal = false;
 
   onMount(() => {
@@ -44,7 +50,7 @@
   }
 
   function handleGameStart() {
-    // fog.coverAll();
+    fog.coverAll();
     showMainModal = false;
   }
 
@@ -63,11 +69,11 @@
    * @param {number} currPanYOffset
    */
   function handleNextTurn(currPlayerId, currPanXOffset, currPanYOffset) {
-    // fog.coverAll();
+    fog.coverAll();
 
     if ($store.gameServer.selfId === currPlayerId) {
       board.setPanOffset(currPanXOffset, currPanYOffset);
-      // fog.coverPart();
+      fog.coverPart();
     }
   }
 
@@ -122,6 +128,8 @@
   {#if showMainModal}
     <MainModal joinLink={$store.gameServer.joinLink} />
   {/if}
+
+  <Fog bind:this={fog} />
 </div>
 
 <style>
