@@ -1,24 +1,38 @@
 <script>
-  let visibleRadius = "100vmax";
+  let visibleRadius = "0px";
 
-  export function coverAll() {}
+  // Expose functions like these to make way for animations/transitions.
 
-  export function coverPart() {}
+  export function coverAll() {
+    visibleRadius = "0px";
+  }
 
-  export function hide() {}
+  export function coverPart() {
+    visibleRadius = "90vmin";
+  }
+
+  export function retract() {
+    visibleRadius = "100vmax";
+  }
 </script>
 
-<div class="fog" style="--visible-radius: {visibleRadius};"></div>
+<div
+  class="fog"
+  class:retracted={visibleRadius !== "0px"}
+  style="--visible-radius: {visibleRadius};"
+></div>
 
 <style>
   .fog {
     position: absolute;
     inset: 0;
+  }
 
+  .fog.retracted {
     pointer-events: none;
   }
 
-  .fog:not(.hidden)::after {
+  .fog::after {
     content: "";
 
     position: absolute;

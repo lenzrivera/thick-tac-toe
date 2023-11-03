@@ -45,6 +45,7 @@
       resetUrl();
       $store.gameServer.startGame(opponentId);
     } else {
+      fog.retract();
       showMainModal = true;
     }
   }
@@ -113,7 +114,7 @@
    * @param {boolean[][]} winningTiles
    */
   function handleGameEnd(winningTiles) {
-    fog.hide();
+    fog.retract();
     board.zoomOut();
     board.highlightTiles(winningTiles);
 
