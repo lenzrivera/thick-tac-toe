@@ -15,6 +15,7 @@
   class:x={content === "X"}
   class:o={content === "O"}
   class:covered
+  on:pointerup
 ></div>
 
 <style>

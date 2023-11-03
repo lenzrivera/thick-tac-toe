@@ -83,7 +83,8 @@
    * @param {number} tileY
    */
   function handleTileClick(tileX, tileY) {
-    $store.gameServer.placeOnTile(tileX, tileY);
+    console.log(tileX, tileY);
+    // $store.gameServer.placeOnTile(tileX, tileY);
   }
 
   /**
@@ -124,7 +125,11 @@
 </script>
 
 <div class="app">
-  <Board bind:this={board} />
+  <Board
+    bind:this={board}
+    on:tile_click={({ detail: [tileX, tileY] }) =>
+      handleTileClick(tileX, tileY)}
+  />
 
   {#if showMainModal}
     <MainModal joinLink={$store.gameServer.joinLink} />

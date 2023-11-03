@@ -1,4 +1,7 @@
 <script>
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
+
   import Tile from "./Tile.svelte";
 
   const PAN_VEL = 0.0005;
@@ -17,9 +20,6 @@
   let panAnchor = null;
   let prevPanOffset = null;
 
-  $: flatTileContents = tileContents ? tileContents.flat() : [];
-  $: flatCoveredTiles = coveredTiles ? coveredTiles.flat() : [];
-
   /**
    * @param {import('../lib/Game').TileData} tileData
    */
@@ -37,6 +37,14 @@
       `--grid-count: ${tileContents ? tileContents.length : 0};` +
       `--pan-x: ${panOffset.x}; --pan-y: ${panOffset.y};`
     );
+  }
+
+  function handleTileClick(clientX, clientY, tileX, tileY) {
+    if (panAnchor && (panAnchor.x !== clientX || panAnchor.y !== clientY)) {
+      return;
+    }
+
+    dispatch("tile_click", [tileX, tileY]);
   }
 
   /* For panning */
@@ -81,9 +89,23 @@
   on:pointerdown={handleBoardPointerDown}
 >
   <div class="pannable_board">
-    {#each flatTileContents as content, i}
-      <Tile {content} covered={flatCoveredTiles[i]} />
-    {/each}
+    {#if tileContents}
+      {#each tileContents as row, y}
+        {#each row as content, x}
+          <!-- 
+            Clicking a tile means having finished a press (pointerup) without
+            having moved the pointer, i.e. no panning occurred. Simply using
+            on:click will not work due to panning.
+          -->
+          <Tile
+            {content}
+            covered={coveredTiles[y][x]}
+            on:pointerup={({ clientX, clientY }) =>
+              handleTileClick(clientX, clientY, x, y)}
+          />
+        {/each}
+      {/each}
+    {/if}
   </div>
 </div>
 
