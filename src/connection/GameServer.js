@@ -15,7 +15,7 @@ export class GameServer extends EventEmitter {
   }
 
   get selfId() {
-    return this.connection.id;
+    return this.connection.selfId;
   }
 
   get joinLink() {

@@ -27,8 +27,12 @@ export class Connection extends EventEmitter {
     this.self.on("connection", this.handleConnectionToSelf, this);
   }
 
-  get id() {
+  get selfId() {
     return this.self.id;
+  }
+
+  get peerId() {
+    return this.peer?.peer;
   }
 
   handleOpen() {

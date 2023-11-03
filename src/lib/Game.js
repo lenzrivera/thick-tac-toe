@@ -17,11 +17,36 @@ export class Game {
   constructor(connection) {
     this.connection = connection;
 
+    this.players = Game.genPlayers(connection);
+    this.currPlayerIndex = 0;
+
     this.tileContents = Game.genTileContents();
     this.coveredTiles = Game.genRandomCoveredTiles();
 
     this.connection.broadcast("game_start");
     this.connection.broadcast("game_update", this.tileData);
+    this.connection.broadcast(
+      "next_turn",
+      this.currentPlayer,
+      ...Game.genPanOffset(),
+    );
+  }
+
+  /**
+   * @param {import('../connection/Connection').Connection} connection
+   */
+  static genPlayers(connection) {
+    const playerList = [];
+
+    if (Math.random() < 0.5) {
+      playerList.push(connection.selfId);
+      playerList.push(connection.peerId);
+    } else {
+      playerList.push(connection.peerId);
+      playerList.push(connection.selfId);
+    }
+
+    return playerList;
   }
 
   /**
@@ -46,6 +71,19 @@ export class Game {
     }
 
     return coveredTiles;
+  }
+
+  static genPanOffset() {
+    const halfSize = Math.floor(BOARD_SIZE / 2);
+
+    const panX = Math.floor(Math.random() * halfSize);
+    const panY = Math.floor(Math.random() * halfSize);
+
+    return [panX, panY];
+  }
+
+  get currentPlayer() {
+    return this.players[this.currPlayerIndex];
   }
 
   /**

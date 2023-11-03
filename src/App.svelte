@@ -63,11 +63,12 @@
    * @param {number} currPanYOffset
    */
   function handleNextTurn(currPlayerId, currPanXOffset, currPanYOffset) {
-    fog.coverAll();
+    // fog.coverAll();
 
     if ($store.gameServer.selfId === currPlayerId) {
-      board.setPanOffset(currPanXOffset, currPanYOffset);
-      fog.coverPart();
+      console.log(currPanXOffset, currPanYOffset);
+      // board.setPanOffset(currPanXOffset, currPanYOffset);
+      // fog.coverPart();
     }
   }
 
