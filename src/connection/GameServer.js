@@ -26,8 +26,8 @@ export class GameServer extends EventEmitter {
     this.emit("connection_ready");
   }
 
-  handleConnectionMessage({ msgName, args }) {
-    this.emit(msgName, ...args);
+  handleConnectionMessage({ name, args }) {
+    this.emit(name, ...args);
   }
 
   /**

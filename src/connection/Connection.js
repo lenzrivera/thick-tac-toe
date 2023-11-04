@@ -3,7 +3,7 @@ import Peer from "peerjs";
 
 /**
  * @typedef Message
- * @prop {string} msgName
+ * @prop {string} name
  * @prop {any[]} args
  */
 
@@ -59,12 +59,12 @@ export class Connection extends EventEmitter {
   }
 
   /**
-   * @param {string} msgName
+   * @param {string} name
    * @param  {...any} args
    */
-  broadcast(msgName, ...args) {
-    this.send(msgName, ...args);
-    this.handleMessageReceive({ msgName, args });
+  broadcast(name, ...args) {
+    this.send(this.selfId, { name, args });
+    this.send(this.peerId, { name, args });
   }
 
   /**
@@ -90,14 +90,19 @@ export class Connection extends EventEmitter {
   }
 
   /**
-   * @param {string} msgName
-   * @param {...any} args
+   * @param {string} peerId
+   * @param {Message} message
    */
-  send(msgName, ...args) {
-    if (!this.peer) {
-      throw new Error("Cannot send data to nonexistent peer.");
+  send(peerId, { name, args }) {
+    if (peerId !== this.selfId && peerId !== this.peerId) {
+      throw new Error("Cannot send data to an invalid peer.");
     }
 
-    this.peer.send({ msgName, args });
+    if (peerId === this.selfId) {
+      this.handleMessageReceive({ name, args });
+      return;
+    }
+
+    this.peer.send({ name, args });
   }
 }
