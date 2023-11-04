@@ -83,8 +83,10 @@
    * @param {number} tileY
    */
   function handleTileClick(tileX, tileY) {
-    console.log(tileX, tileY);
-    // $store.gameServer.placeOnTile(tileX, tileY);
+    $store.gameServer.sendCommand({
+      name: "placeOnTile",
+      args: [tileX, tileY],
+    });
   }
 
   /**
@@ -93,8 +95,10 @@
    * @param {object} type
    */
   function handleUncoveredTilePlace(tileX, tileY, type) {
-    board.placeOnTile(tileX, tileY, type);
-    $store.gameServer.nextTurn();
+    console.log("uncovered", tileX, tileY, type);
+
+    // board.placeOnTile(tileX, tileY, type);
+    // $store.gameServer.nextTurn();
   }
 
   /**
@@ -103,12 +107,13 @@
    * @param {object} type
    */
   function handleCoveredTilePlace(tileX, tileY, type) {
-    if (type !== null) {
-      board.placeOnTile(tileX, tileY, type);
-    }
+    console.log("covered", tileX, tileY, type);
 
-    board.uncoverTile(tileX, tileY);
-    $store.gameServer.nextTurn();
+    // if (type !== null) {
+    //   board.placeOnTile(tileX, tileY, type);
+    // }
+    // board.uncoverTile(tileX, tileY);
+    // $store.gameServer.nextTurn();
   }
 
   /**

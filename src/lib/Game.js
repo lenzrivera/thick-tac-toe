@@ -33,6 +33,15 @@ export class Game {
   }
 
   /**
+   * @param {number} x
+   * @param {number} y
+   * @returns {boolean}
+   */
+  static coordsInBounds(x, y) {
+    return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
+  }
+
+  /**
    * @param {import('../connection/Connection').Connection} connection
    */
   static genPlayers(connection) {
@@ -86,6 +95,14 @@ export class Game {
   }
 
   /**
+   * @returns {TileContent}
+   */
+  get currentSymbol() {
+    // @ts-ignore - idk why it's emitting an error here.
+    return ["X", "O"][this.currPlayerIndex];
+  }
+
+  /**
    * @returns {TileData}
    */
   get tileData() {
@@ -93,5 +110,39 @@ export class Game {
       tileContents: this.tileContents,
       coveredTiles: this.coveredTiles,
     };
+  }
+
+  placeOnTile(tileX, tileY) {
+    if (!Game.coordsInBounds(tileX, tileY)) {
+      return;
+    }
+
+    if (!this.tileContents[tileY][tileX]) {
+      this.tileContents[tileY][tileX] = this.currentSymbol;
+
+      // Attempted to place on a covered unoccupied tile
+      if (this.coveredTiles[tileY][tileX]) {
+        this.connection.send(this.currentPlayer, {
+          name: "covered_tile_place",
+          args: [tileX, tileY, this.currentSymbol],
+        });
+      }
+
+      // Attempted to place on an uncovered unoccupied tile
+      else {
+        this.connection.send(this.currentPlayer, {
+          name: "uncovered_tile_place",
+          args: [tileX, tileY, this.currentSymbol],
+        });
+      }
+    } else {
+      // Attempted to place on an covered occupied tile
+      if (this.coveredTiles[tileY][tileX]) {
+        this.connection.send(this.currentPlayer, {
+          name: "covered_tile_place",
+          args: [tileX, tileY, null],
+        });
+      }
+    }
   }
 }

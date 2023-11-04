@@ -27,7 +27,24 @@ export class GameServer extends EventEmitter {
   }
 
   handleConnectionMessage({ name, args }) {
+    if (name === "game_command") {
+      this.callCommand(args);
+      return;
+    }
+
     this.emit(name, ...args);
+  }
+
+  callCommand(command) {
+    if (!this.instance) {
+      throw new Error("Cannot call command without game instance.");
+    }
+
+    if (typeof this.instance[command.name] !== "function") {
+      return;
+    }
+
+    this.instance[command.name](...command.args);
   }
 
   /**
@@ -38,5 +55,17 @@ export class GameServer extends EventEmitter {
     await this.connection.connect(opponentId);
 
     this.instance = new Game(this.connection);
+  }
+
+  sendCommand(command) {
+    if (!this.instance) {
+      this.connection.send(this.connection.peerId, {
+        name: "game_command",
+        args: command,
+      });
+      return;
+    }
+
+    this.callCommand(command);
   }
 }
