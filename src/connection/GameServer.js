@@ -44,7 +44,7 @@ export class GameServer extends EventEmitter {
       return;
     }
 
-    this.instance[command.name](...command.args);
+    this.instance[command.name](...(command.args ?? []));
   }
 
   /**
