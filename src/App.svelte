@@ -95,9 +95,7 @@
    * @param {object} type
    */
   function handleUncoveredTilePlace(tileX, tileY, type) {
-    console.log("uncovered", tileX, tileY, type);
-
-    // board.placeOnTile(tileX, tileY, type);
+    board.placeOnTile(tileX, tileY, type);
     // $store.gameServer.nextTurn();
   }
 

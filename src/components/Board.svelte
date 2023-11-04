@@ -20,6 +20,12 @@
   let panAnchor = null;
   let prevPanOffset = null;
 
+  export function placeOnTile(tileX, tileY, type) {
+    // TODO: Handle case where this.tileContents is null.
+    tileContents[tileY][tileX] = type;
+    tileContents = tileContents;
+  }
+
   /**
    * @param {import('../lib/Game').TileData} tileData
    */
