@@ -105,12 +105,11 @@
    * @param {object} type
    */
   function handleCoveredTilePlace(tileX, tileY, type) {
-    console.log("covered", tileX, tileY, type);
+    if (type !== null) {
+      board.placeOnTile(tileX, tileY, type);
+    }
 
-    // if (type !== null) {
-    //   board.placeOnTile(tileX, tileY, type);
-    // }
-    // board.uncoverTile(tileX, tileY);
+    board.uncoverTile(tileX, tileY);
     // $store.gameServer.nextTurn();
   }
 

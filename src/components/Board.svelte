@@ -21,9 +21,15 @@
   let prevPanOffset = null;
 
   export function placeOnTile(tileX, tileY, type) {
-    // TODO: Handle case where this.tileContents is null.
+    // TODO: Handle case where tileContents is null.
     tileContents[tileY][tileX] = type;
     tileContents = tileContents;
+  }
+
+  export function uncoverTile(tileX, tileY) {
+    // TODO: Handle case where coveredTiles is null.
+    coveredTiles[tileY][tileX] = false;
+    coveredTiles = coveredTiles;
   }
 
   /**
