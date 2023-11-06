@@ -96,7 +96,7 @@
    */
   function handleUncoveredTilePlace(tileX, tileY, type) {
     board.placeOnTile(tileX, tileY, type);
-    // $store.gameServer.nextTurn();
+    $store.gameServer.sendCommand({ name: "nextTurn" });
   }
 
   /**
@@ -110,7 +110,7 @@
     }
 
     board.uncoverTile(tileX, tileY);
-    // $store.gameServer.nextTurn();
+    $store.gameServer.sendCommand({ name: "nextTurn" });
   }
 
   /**

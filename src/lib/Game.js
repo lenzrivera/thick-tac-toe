@@ -144,4 +144,21 @@ export class Game {
       }
     }
   }
+
+  nextTurn() {
+    this.currPlayerIndex = (this.currPlayerIndex + 1) % 2;
+    this.coveredTiles = Game.genRandomCoveredTiles();
+
+    // Update the current player on the results of the actions of the prior
+    // player + all players on the new covered tiles.
+    this.connection.broadcast({
+      name: "game_update",
+      args: [this.tileData],
+    });
+
+    this.connection.broadcast({
+      name: "next_turn",
+      args: [this.currentPlayer, ...Game.genPanOffset()],
+    });
+  }
 }
