@@ -28,8 +28,12 @@
 
   export function uncoverTile(tileX, tileY) {
     // TODO: Handle case where coveredTiles is null.
-    coveredTiles[tileY][tileX] = false;
-    coveredTiles = coveredTiles;
+    return new Promise((resolve) => {
+      coveredTiles[tileY][tileX] = false;
+      coveredTiles = coveredTiles;
+
+      setTimeout(resolve, 1500);
+    });
   }
 
   /**

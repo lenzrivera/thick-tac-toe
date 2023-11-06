@@ -104,12 +104,12 @@
    * @param {number} tileY
    * @param {object} type
    */
-  function handleCoveredTilePlace(tileX, tileY, type) {
+  async function handleCoveredTilePlace(tileX, tileY, type) {
     if (type !== null) {
       board.placeOnTile(tileX, tileY, type);
     }
 
-    board.uncoverTile(tileX, tileY);
+    await board.uncoverTile(tileX, tileY);
     $store.gameServer.sendCommand({ name: "nextTurn" });
   }
 
