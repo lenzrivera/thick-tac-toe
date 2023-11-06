@@ -98,10 +98,10 @@ export class Connection extends EventEmitter {
     }
 
     if (peerId === this.selfId) {
-      this.handleMessageReceive({ name, args });
+      this.handleMessageReceive({ name, args: args ?? [] });
       return;
     }
 
-    this.peer.send({ name, args });
+    this.peer.send({ name, args: args ?? [] });
   }
 }
