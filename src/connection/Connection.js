@@ -4,7 +4,7 @@ import Peer from "peerjs";
 /**
  * @typedef Message
  * @prop {string} name
- * @prop {any[]} args
+ * @prop {any[]} [args]
  */
 
 // TODO: Explicitly close other connections when already connected to a peer.
@@ -59,10 +59,9 @@ export class Connection extends EventEmitter {
   }
 
   /**
-   * @param {string} name
-   * @param  {...any} args
+   * @param {Message} message
    */
-  broadcast(name, ...args) {
+  broadcast({ name, args }) {
     this.send(this.selfId, { name, args });
     this.send(this.peerId, { name, args });
   }

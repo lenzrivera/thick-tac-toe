@@ -23,13 +23,12 @@ export class Game {
     this.tileContents = Game.genTileContents();
     this.coveredTiles = Game.genRandomCoveredTiles();
 
-    this.connection.broadcast("game_start");
-    this.connection.broadcast("game_update", this.tileData);
-    this.connection.broadcast(
-      "next_turn",
-      this.currentPlayer,
-      ...Game.genPanOffset(),
-    );
+    this.connection.broadcast({ name: "game_start" });
+    this.connection.broadcast({ name: "game_update", args: [this.tileData] });
+    this.connection.broadcast({
+      name: "next_turn",
+      args: [this.currentPlayer, ...Game.genPanOffset()],
+    });
   }
 
   /**
