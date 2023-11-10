@@ -20,8 +20,7 @@
 
 <style>
   .tile {
-    /* Without transforms, the whole board should fit the screen. */
-    --tile-size: calc(100vmin / var(--grid-count));
+    --tile-size: calc(100vmin / var(--visible-tile-count));
 
     position: relative;
 

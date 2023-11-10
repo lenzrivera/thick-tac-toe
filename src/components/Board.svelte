@@ -1,10 +1,8 @@
 <script>
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, getContext, tick } from "svelte";
   const dispatch = createEventDispatcher();
 
   import Tile from "./Tile.svelte";
-
-  const PAN_VEL = 0.0005;
 
   /**
    * @type {?import('../lib/Game').TileContent[][]}
@@ -19,6 +17,11 @@
   let panOffset = { x: 0, y: 0 };
   let panAnchor = null;
   let prevPanOffset = null;
+  let panVelocity = 0;
+
+  $: computePanVelocity(tileContents);
+
+  const { fogRadius } = getContext("fog_screen");
 
   export function placeOnTile(tileX, tileY, type) {
     // TODO: Handle case where tileContents is null.
@@ -56,7 +59,10 @@
   }
 
   function handleTileClick(clientX, clientY, tileX, tileY) {
-    if (panAnchor && (panAnchor.x !== clientX || panAnchor.y !== clientY)) {
+    if (
+      isInFogZone(clientX, clientY) ||
+      (panAnchor && (panAnchor.x !== clientX || panAnchor.y !== clientY))
+    ) {
       return;
     }
 
@@ -69,13 +75,40 @@
     return Math.max(min, Math.min(val, max));
   }
 
+  async function computePanVelocity(tileContents) {
+    // TODO: Think of a less janky way to do this (looking at you, querySelector()).
+
+    if (!tileContents) {
+      return 0;
+    }
+
+    await tick();
+
+    /**
+     * @type {HTMLDivElement}
+     */
+    const tileElem = document.querySelector(".tile");
+
+    const tileSize = tileElem.offsetWidth;
+    const tileLineCount = tileContents.length;
+
+    panVelocity = 1.2 / (tileLineCount * tileSize);
+  }
+
+  function isInFogZone(cursorX, cursorY) {
+    const cx = window.innerWidth / 2 - cursorX;
+    const cy = window.innerHeight / 2 - cursorY;
+
+    return cx ** 2 + cy ** 2 > $fogRadius ** 2;
+  }
+
   function handleBoardPointerDown({ clientX, clientY }) {
     panAnchor = { x: clientX, y: clientY };
     prevPanOffset = { ...panOffset };
   }
 
   function handlePointerMove({ clientX, clientY }) {
-    if (!panAnchor || !prevPanOffset) {
+    if (isInFogZone(clientX, clientY) || !panAnchor || !prevPanOffset) {
       return;
     }
 
@@ -83,8 +116,8 @@
     const dy = clientY - panAnchor.y;
 
     panOffset = {
-      x: clamp(prevPanOffset.x + dx * PAN_VEL, -1, 1),
-      y: clamp(prevPanOffset.y + dy * PAN_VEL, -1, 1),
+      x: clamp(prevPanOffset.x + dx * panVelocity, -1, 1),
+      y: clamp(prevPanOffset.y + dy * panVelocity, -1, 1),
     };
   }
 
@@ -93,6 +126,9 @@
     prevPanOffset = null;
   }
 </script>
+
+<!-- Pan velocity depends on the actual size of the tiles. -->
+<svelte:window on:resize={() => computePanVelocity(tileContents)} />
 
 <svelte:body
   on:pointermove={handlePointerMove}
@@ -128,19 +164,12 @@
 <style>
   .board {
     --visible-tile-count: 5;
-    --zoom-scale: 0;
 
     position: absolute;
     inset: 0;
     overflow: hidden;
 
-    /* Scale such that only the supposedly visible region of the board is shown. */
-    --DEFAULT-SCALE: 100% * var(--grid-count) / var(--visible-tile-count);
-
-    /* Lerp from --zoom-scale: 0 (normal view) to 1 (all zoomed out). */
-    scale: calc(
-      var(--DEFAULT-SCALE) + var(--zoom-scale) * (100% - var(--DEFAULT-SCALE))
-    );
+    user-select: none;
   }
 
   .pannable_board {

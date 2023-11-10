@@ -5,7 +5,7 @@
   import { store } from "./store";
 
   import Board from "./components/Board.svelte";
-  import Fog from "./components/Fog.svelte";
+  import FogScreen from "./components/FogScreen.svelte";
   import MainModal from "./components/MainModal.svelte";
 
   /**
@@ -14,9 +14,9 @@
   let board;
 
   /**
-   * @type {Fog}
+   * @type {FogScreen}
    */
-  let fog;
+  let fogScreen;
 
   let showMainModal = false;
 
@@ -29,6 +29,8 @@
     $store.gameServer.on("uncovered_tile_place", handleUncoveredTilePlace);
     $store.gameServer.on("covered_tile_place", handleCoveredTilePlace);
     $store.gameServer.once("game_end", handleGameEnd);
+
+    fogScreen.retract();
   });
 
   onDestroy(() => {
@@ -45,13 +47,13 @@
       resetUrl();
       $store.gameServer.startGame(opponentId);
     } else {
-      fog.retract();
+      fogScreen.retract();
       showMainModal = true;
     }
   }
 
   function handleGameStart() {
-    fog.coverAll();
+    fogScreen.coverAll();
     showMainModal = false;
   }
 
@@ -70,18 +72,14 @@
    * @param {number} currPanYOffset
    */
   function handleNextTurn(currPlayerId, currPanXOffset, currPanYOffset) {
-    fog.coverAll();
+    fogScreen.coverAll();
 
     if ($store.gameServer.selfId === currPlayerId) {
       board.setPanOffset(currPanXOffset, currPanYOffset);
-      fog.coverPart();
+      fogScreen.coverPart();
     }
   }
 
-  /**
-   * @param {number} tileX
-   * @param {number} tileY
-   */
   function handleTileClick(tileX, tileY) {
     $store.gameServer.sendCommand({
       name: "placeOnTile",
@@ -117,34 +115,22 @@
    * @param {boolean[][]} winningTiles
    */
   function handleGameEnd(winningTiles) {
-    fog.retract();
+    fogScreen.retract();
     board.zoomOut();
     board.highlightTiles(winningTiles);
 
-    $store.gameServer.endConnection();
+    // $store.gameServer.endConnection();
     showMainModal = true;
   }
 </script>
 
-<div class="app">
+<FogScreen bind:this={fogScreen}>
   <Board
     bind:this={board}
-    on:tile_click={({ detail: [tileX, tileY] }) =>
-      handleTileClick(tileX, tileY)}
+    on:tile_click={({ detail }) => handleTileClick(...detail)}
   />
 
   {#if showMainModal}
     <MainModal joinLink={$store.gameServer.joinLink} />
   {/if}
-
-  <Fog bind:this={fog} />
-</div>
-
-<style>
-  .app {
-    position: fixed;
-    inset: 0;
-
-    background-color: black;
-  }
-</style>
+</FogScreen>

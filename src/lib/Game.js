@@ -1,4 +1,4 @@
-export const BOARD_SIZE = 31;
+export const BOARD_SIZE = 7;
 
 /**
  * @typedef {'X'|'O'|null} TileContent
@@ -86,7 +86,9 @@ export class Game {
     const panX = (Math.random() * 2 - 1) / 2;
     const panY = (Math.random() * 2 - 1) / 2;
 
-    return [panX, panY];
+    // return [panX, panY];
+
+    return [0, 0];
   }
 
   get currentPlayer() {
