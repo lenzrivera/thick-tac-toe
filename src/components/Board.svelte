@@ -1,8 +1,8 @@
 <script>
-  import { createEventDispatcher, getContext, tick } from "svelte";
+  import { createEventDispatcher, getContext, tick } from 'svelte';
   const dispatch = createEventDispatcher();
 
-  import Tile from "./Tile.svelte";
+  import Tile from './Tile.svelte';
 
   /**
    * @type {?import('../lib/Game').TileContent[][]}
@@ -21,7 +21,7 @@
 
   $: computePanVelocity(tileContents);
 
-  const { fogRadius } = getContext("fog_screen");
+  const { fogRadius } = getContext('fog_screen');
 
   export function placeOnTile(tileX, tileY, type) {
     // TODO: Handle case where tileContents is null.
@@ -31,7 +31,7 @@
 
   export function uncoverTile(tileX, tileY) {
     // TODO: Handle case where coveredTiles is null.
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       coveredTiles[tileY][tileX] = false;
       coveredTiles = coveredTiles;
 
@@ -66,7 +66,7 @@
       return;
     }
 
-    dispatch("tile_click", [tileX, tileY]);
+    dispatch('tile_click', [tileX, tileY]);
   }
 
   /* For panning */
@@ -87,7 +87,7 @@
     /**
      * @type {HTMLDivElement}
      */
-    const tileElem = document.querySelector(".tile");
+    const tileElem = document.querySelector('.tile');
 
     const tileSize = tileElem.offsetWidth;
     const tileLineCount = tileContents.length;

@@ -23,10 +23,10 @@ export class Game {
     this.tileContents = Game.genTileContents();
     this.coveredTiles = Game.genRandomCoveredTiles();
 
-    this.connection.broadcast({ name: "game_start" });
-    this.connection.broadcast({ name: "game_update", args: [this.tileData] });
+    this.connection.broadcast({ name: 'game_start' });
+    this.connection.broadcast({ name: 'game_update', args: [this.tileData] });
     this.connection.broadcast({
-      name: "next_turn",
+      name: 'next_turn',
       args: [this.currentPlayer, ...Game.genPanOffset()],
     });
   }
@@ -100,7 +100,7 @@ export class Game {
    */
   get currentSymbol() {
     // @ts-ignore - idk why it's emitting an error here.
-    return ["X", "O"][this.currPlayerIndex];
+    return ['X', 'O'][this.currPlayerIndex];
   }
 
   /**
@@ -124,7 +124,7 @@ export class Game {
       // Attempted to place on a covered unoccupied tile
       if (this.coveredTiles[tileY][tileX]) {
         this.connection.send(this.currentPlayer, {
-          name: "covered_tile_place",
+          name: 'covered_tile_place',
           args: [tileX, tileY, this.currentSymbol],
         });
       }
@@ -132,7 +132,7 @@ export class Game {
       // Attempted to place on an uncovered unoccupied tile
       else {
         this.connection.send(this.currentPlayer, {
-          name: "uncovered_tile_place",
+          name: 'uncovered_tile_place',
           args: [tileX, tileY, this.currentSymbol],
         });
       }
@@ -140,7 +140,7 @@ export class Game {
       // Attempted to place on an covered occupied tile
       if (this.coveredTiles[tileY][tileX]) {
         this.connection.send(this.currentPlayer, {
-          name: "covered_tile_place",
+          name: 'covered_tile_place',
           args: [tileX, tileY, null],
         });
       }
@@ -154,12 +154,12 @@ export class Game {
     // Update the current player on the results of the actions of the prior
     // player + all players on the new covered tiles.
     this.connection.broadcast({
-      name: "game_update",
+      name: 'game_update',
       args: [this.tileData],
     });
 
     this.connection.broadcast({
-      name: "next_turn",
+      name: 'next_turn',
       args: [this.currentPlayer, ...Game.genPanOffset()],
     });
   }

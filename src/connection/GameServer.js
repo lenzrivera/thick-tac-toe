@@ -1,7 +1,7 @@
-import EventEmitter from "eventemitter3";
+import EventEmitter from 'eventemitter3';
 
-import { Game } from "../lib/Game";
-import { Connection } from "./Connection";
+import { Game } from '../lib/Game';
+import { Connection } from './Connection';
 
 export class GameServer extends EventEmitter {
   constructor() {
@@ -10,8 +10,8 @@ export class GameServer extends EventEmitter {
     this.connection = new Connection();
     this.instance = null;
 
-    this.connection.once("open", this.handleConnectionOpen, this);
-    this.connection.on("message", this.handleConnectionMessage, this);
+    this.connection.once('open', this.handleConnectionOpen, this);
+    this.connection.on('message', this.handleConnectionMessage, this);
   }
 
   get selfId() {
@@ -23,11 +23,11 @@ export class GameServer extends EventEmitter {
   }
 
   handleConnectionOpen() {
-    this.emit("connection_ready");
+    this.emit('connection_ready');
   }
 
   handleConnectionMessage({ name, args }) {
-    if (name === "game_command") {
+    if (name === 'game_command') {
       this.callCommand(args);
       return;
     }
@@ -37,10 +37,10 @@ export class GameServer extends EventEmitter {
 
   callCommand(command) {
     if (!this.instance) {
-      throw new Error("Cannot call command without game instance.");
+      throw new Error('Cannot call command without game instance.');
     }
 
-    if (typeof this.instance[command.name] !== "function") {
+    if (typeof this.instance[command.name] !== 'function') {
       return;
     }
 
@@ -60,7 +60,7 @@ export class GameServer extends EventEmitter {
   sendCommand(command) {
     if (!this.instance) {
       this.connection.send(this.connection.peerId, {
-        name: "game_command",
+        name: 'game_command',
         args: command,
       });
       return;

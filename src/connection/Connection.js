@@ -1,5 +1,5 @@
-import EventEmitter from "eventemitter3";
-import Peer from "peerjs";
+import EventEmitter from 'eventemitter3';
+import Peer from 'peerjs';
 
 /**
  * @typedef Message
@@ -22,9 +22,9 @@ export class Connection extends EventEmitter {
     this.peer = null;
 
     // @ts-ignore
-    this.self.once("open", this.handleOpen, this);
+    this.self.once('open', this.handleOpen, this);
     // @ts-ignore
-    this.self.on("connection", this.handleConnectionToSelf, this);
+    this.self.on('connection', this.handleConnectionToSelf, this);
   }
 
   get selfId() {
@@ -36,7 +36,7 @@ export class Connection extends EventEmitter {
   }
 
   handleOpen() {
-    this.emit("open");
+    this.emit('open');
   }
 
   /**
@@ -45,9 +45,9 @@ export class Connection extends EventEmitter {
   handleConnectionToSelf(conn) {
     this.peer = conn;
 
-    conn.once("open", () => {
+    conn.once('open', () => {
       // @ts-ignore
-      conn.on("data", this.handleMessageReceive, this);
+      conn.on('data', this.handleMessageReceive, this);
     });
   }
 
@@ -55,7 +55,7 @@ export class Connection extends EventEmitter {
    * @param {Message} messageData
    */
   handleMessageReceive(messageData) {
-    this.emit("message", messageData);
+    this.emit('message', messageData);
   }
 
   /**
@@ -74,14 +74,14 @@ export class Connection extends EventEmitter {
     const conn = this.self.connect(peerId);
 
     return new Promise((resolve, reject) => {
-      this.self.once("error", reject);
+      this.self.once('error', reject);
 
-      conn.once("open", () => {
+      conn.once('open', () => {
         this.peer = conn;
 
         // Handle data from connections made *from* self.
         // @ts-ignore
-        this.peer.on("data", this.handleMessageReceive, this);
+        this.peer.on('data', this.handleMessageReceive, this);
 
         resolve();
       });
@@ -94,7 +94,7 @@ export class Connection extends EventEmitter {
    */
   send(peerId, { name, args }) {
     if (peerId !== this.selfId && peerId !== this.peerId) {
-      throw new Error("Cannot send data to an invalid peer.");
+      throw new Error('Cannot send data to an invalid peer.');
     }
 
     if (peerId === this.selfId) {

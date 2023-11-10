@@ -1,5 +1,5 @@
 export function getOpponentIdFromJoinLink() {
-  return new URLSearchParams(location.search).get("id");
+  return new URLSearchParams(location.search).get('id');
 }
 
 export function resetUrl() {
