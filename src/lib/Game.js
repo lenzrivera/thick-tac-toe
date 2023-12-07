@@ -128,7 +128,7 @@ export class Game {
      * @param {(i: number) => number[]} nextTile
      */
     const hasWinningLine = nextTile => {
-      let numConsecutive = 0;
+      let candidateTiles = [];
 
       for (let i = 0; i < WINNING_LINE_LEN * 2; i++) {
         const [nextX, nextY] = nextTile(i);
@@ -137,31 +137,58 @@ export class Game {
           continue;
         }
 
-        if (this.tileContents[nextY][nextX] !== this.currentSymbol) {
-          numConsecutive = 0;
-          continue;
+        if (candidateTiles.length < WINNING_LINE_LEN) {
+          if (this.tileContents[nextY][nextX] !== this.currentSymbol) {
+            candidateTiles = [];
+            continue;
+          }
+
+          candidateTiles.push([nextX, nextY]);
         }
 
-        numConsecutive += 1;
+        // Keep on adding tiles even if WINNING_LINE_LEN has been reached to
+        // cover cases where a winning line was built from between.
+        else {
+          if (this.tileContents[nextY][nextX] !== this.currentSymbol) {
+            break;
+          }
 
-        if (numConsecutive === WINNING_LINE_LEN) {
-          return true;
+          candidateTiles.push([nextX, nextY]);
         }
       }
 
-      return false;
+      return candidateTiles.length >= WINNING_LINE_LEN ? candidateTiles : [];
     };
 
-    return (
-      // Left-to-right diagonal
-      hasWinningLine(i => [leftX + i, topY + i]) ||
-      // Top-to-down vertical
-      hasWinningLine(i => [placeX, topY + i]) ||
-      // Right-to-left diagonal
-      hasWinningLine(i => [rightX - i, topY + i]) ||
-      // Left-to-right horizontal
-      hasWinningLine(i => [leftX + i, placeY])
-    );
+    // Left-to-right diagonal
+    const ltrdLine = hasWinningLine(i => [leftX + i, topY + i]);
+
+    if (ltrdLine.length !== 0) {
+      return ltrdLine;
+    }
+
+    // Top-to-down vertical
+    const ttdvLine = hasWinningLine(i => [placeX, topY + i]);
+
+    if (ttdvLine.length !== 0) {
+      return ttdvLine;
+    }
+
+    // Right-to-left diagonal
+    const rtldLine = hasWinningLine(i => [rightX - i, topY + i]);
+
+    if (rtldLine.length !== 0) {
+      return rtldLine;
+    }
+
+    // Left-to-right horizontal
+    const ltrhLine = hasWinningLine(i => [leftX + i, placeY]);
+
+    if (ltrhLine.length !== 0) {
+      return ltrhLine;
+    }
+
+    return [];
   }
 
   checkDrawCondition() {
@@ -171,8 +198,8 @@ export class Game {
   checkEndCondition(placeX, placeY) {
     const winningTiles = this.checkWinCondition(placeX, placeY);
 
-    if (winningTiles) {
-      this.connection.broadcast({ name: 'game_end', args: [[]] });
+    if (winningTiles.length !== 0) {
+      this.connection.broadcast({ name: 'game_end', args: [winningTiles] });
       this.done = true;
     } else if (this.checkDrawCondition()) {
       this.connection.broadcast({ name: 'game_end' });

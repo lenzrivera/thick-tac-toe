@@ -115,6 +115,8 @@
    * @param {boolean[][]} winningTiles
    */
   function handleGameEnd(winningTiles) {
+    console.log(winningTiles);
+
     fogScreen.retract();
     // board.zoomOut();
     // board.highlightTiles(winningTiles);
