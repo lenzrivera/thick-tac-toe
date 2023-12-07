@@ -10,7 +10,7 @@
 
 const WINNING_LINE_LEN = 3;
 
-export const BOARD_SIZE = 7;
+export const BOARD_SIZE = 5;
 
 export class Game {
   /**
@@ -165,8 +165,7 @@ export class Game {
   }
 
   checkDrawCondition() {
-    // TODO: lol
-    return false;
+    return this.tileContents.every(row => row.every(tile => tile !== null));
   }
 
   checkEndCondition(placeX, placeY) {
