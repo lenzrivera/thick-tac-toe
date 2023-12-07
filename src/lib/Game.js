@@ -1,5 +1,3 @@
-export const BOARD_SIZE = 7;
-
 /**
  * @typedef {'X'|'O'|null} TileContent
  */
@@ -10,12 +8,18 @@ export const BOARD_SIZE = 7;
  * @prop {boolean[][]} coveredTiles
  */
 
+const WINNING_LINE_LEN = 3;
+
+export const BOARD_SIZE = 7;
+
 export class Game {
   /**
    * @param {import('../connection/Connection').Connection} connection
    */
   constructor(connection) {
     this.connection = connection;
+
+    this.done = false;
 
     this.players = Game.genPlayers(connection);
     this.currPlayerIndex = 0;
@@ -86,9 +90,7 @@ export class Game {
     const panX = (Math.random() * 2 - 1) / 2;
     const panY = (Math.random() * 2 - 1) / 2;
 
-    // return [panX, panY];
-
-    return [0, 0];
+    return [panX, panY];
   }
 
   get currentPlayer() {
@@ -111,6 +113,72 @@ export class Game {
       tileContents: this.tileContents,
       coveredTiles: this.coveredTiles,
     };
+  }
+
+  checkWinCondition(placeX, placeY) {
+    // Basically, try going over a line of length 2 * WINNING_LINE_LEN from the
+    // tile placed on and see if there is a consecutive WINNING_LINE_LEN streak
+    // to determine if a winning placement has occured.
+
+    const leftX = placeX - (WINNING_LINE_LEN - 1);
+    const rightX = placeX + (WINNING_LINE_LEN - 1);
+    const topY = placeY - (WINNING_LINE_LEN - 1);
+
+    /**
+     * @param {(i: number) => number[]} nextTile
+     */
+    const hasWinningLine = nextTile => {
+      let numConsecutive = 0;
+
+      for (let i = 0; i < WINNING_LINE_LEN * 2; i++) {
+        const [nextX, nextY] = nextTile(i);
+
+        if (!Game.coordsInBounds(nextX, nextY)) {
+          continue;
+        }
+
+        if (this.tileContents[nextY][nextX] !== this.currentSymbol) {
+          numConsecutive = 0;
+          continue;
+        }
+
+        numConsecutive += 1;
+
+        if (numConsecutive === WINNING_LINE_LEN) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    return (
+      // Left-to-right diagonal
+      hasWinningLine(i => [leftX + i, topY + i]) ||
+      // Top-to-down vertical
+      hasWinningLine(i => [placeX, topY + i]) ||
+      // Right-to-left diagonal
+      hasWinningLine(i => [rightX - i, topY + i]) ||
+      // Left-to-right horizontal
+      hasWinningLine(i => [leftX + i, placeY])
+    );
+  }
+
+  checkDrawCondition() {
+    // TODO: lol
+    return false;
+  }
+
+  checkEndCondition(placeX, placeY) {
+    const winningTiles = this.checkWinCondition(placeX, placeY);
+
+    if (winningTiles) {
+      this.connection.broadcast({ name: 'game_end', args: [[]] });
+      this.done = true;
+    } else if (this.checkDrawCondition()) {
+      this.connection.broadcast({ name: 'game_end' });
+      this.done = true;
+    }
   }
 
   placeOnTile(tileX, tileY) {
@@ -136,6 +204,8 @@ export class Game {
           args: [tileX, tileY, this.currentSymbol],
         });
       }
+
+      this.checkEndCondition(tileX, tileY);
     } else {
       // Attempted to place on an covered occupied tile
       if (this.coveredTiles[tileY][tileX]) {
@@ -148,6 +218,10 @@ export class Game {
   }
 
   nextTurn() {
+    if (this.done) {
+      return;
+    }
+
     this.currPlayerIndex = (this.currPlayerIndex + 1) % 2;
     this.coveredTiles = Game.genRandomCoveredTiles();
 

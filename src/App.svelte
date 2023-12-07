@@ -1,12 +1,12 @@
 <script>
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount } from 'svelte';
 
-  import { getOpponentIdFromJoinLink, resetUrl } from "./connection/join_link";
-  import { store } from "./store";
+  import { getOpponentIdFromJoinLink, resetUrl } from './connection/join_link';
+  import { store } from './store';
 
-  import Board from "./components/Board.svelte";
-  import FogScreen from "./components/FogScreen.svelte";
-  import MainModal from "./components/MainModal.svelte";
+  import Board from './components/Board.svelte';
+  import FogScreen from './components/FogScreen.svelte';
+  import MainModal from './components/MainModal.svelte';
 
   /**
    * @type {Board}
@@ -21,23 +21,23 @@
   let showMainModal = false;
 
   onMount(() => {
-    $store.gameServer.once("connection_ready", handleConnectionReady);
+    $store.gameServer.once('connection_ready', handleConnectionReady);
 
-    $store.gameServer.once("game_start", handleGameStart);
-    $store.gameServer.on("game_update", handleGameUpdate);
-    $store.gameServer.on("next_turn", handleNextTurn);
-    $store.gameServer.on("uncovered_tile_place", handleUncoveredTilePlace);
-    $store.gameServer.on("covered_tile_place", handleCoveredTilePlace);
-    $store.gameServer.once("game_end", handleGameEnd);
+    $store.gameServer.once('game_start', handleGameStart);
+    $store.gameServer.on('game_update', handleGameUpdate);
+    $store.gameServer.on('next_turn', handleNextTurn);
+    $store.gameServer.on('uncovered_tile_place', handleUncoveredTilePlace);
+    $store.gameServer.on('covered_tile_place', handleCoveredTilePlace);
+    $store.gameServer.once('game_end', handleGameEnd);
 
     fogScreen.retract();
   });
 
   onDestroy(() => {
-    $store.gameServer.off("game_update", handleGameUpdate);
-    $store.gameServer.off("next_turn", handleNextTurn);
-    $store.gameServer.off("uncovered_tile_place", handleUncoveredTilePlace);
-    $store.gameServer.off("covered_tile_place", handleCoveredTilePlace);
+    $store.gameServer.off('game_update', handleGameUpdate);
+    $store.gameServer.off('next_turn', handleNextTurn);
+    $store.gameServer.off('uncovered_tile_place', handleUncoveredTilePlace);
+    $store.gameServer.off('covered_tile_place', handleCoveredTilePlace);
   });
 
   function handleConnectionReady() {
@@ -82,7 +82,7 @@
 
   function handleTileClick(tileX, tileY) {
     $store.gameServer.sendCommand({
-      name: "placeOnTile",
+      name: 'placeOnTile',
       args: [tileX, tileY],
     });
   }
@@ -94,7 +94,7 @@
    */
   function handleUncoveredTilePlace(tileX, tileY, type) {
     board.placeOnTile(tileX, tileY, type);
-    $store.gameServer.sendCommand({ name: "nextTurn" });
+    $store.gameServer.sendCommand({ name: 'nextTurn' });
   }
 
   /**
@@ -108,7 +108,7 @@
     }
 
     await board.uncoverTile(tileX, tileY);
-    $store.gameServer.sendCommand({ name: "nextTurn" });
+    $store.gameServer.sendCommand({ name: 'nextTurn' });
   }
 
   /**
@@ -116,8 +116,8 @@
    */
   function handleGameEnd(winningTiles) {
     fogScreen.retract();
-    board.zoomOut();
-    board.highlightTiles(winningTiles);
+    // board.zoomOut();
+    // board.highlightTiles(winningTiles);
 
     // $store.gameServer.endConnection();
     showMainModal = true;

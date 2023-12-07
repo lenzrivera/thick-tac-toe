@@ -1,18 +1,18 @@
 <script>
-  import { setContext, tick } from "svelte";
-  import { readable } from "svelte/store";
+  import { setContext, tick } from 'svelte';
+  import { readable } from 'svelte/store';
 
   /**
    * @type {string}
    */
-  let visibleRadius = "0px";
+  let visibleRadius = '0px';
 
   /**
    * @type {HTMLDivElement}
    */
   let fogElem;
 
-  setContext("fog_screen", {
+  setContext('fog_screen', {
     fogRadius: readable(0, function start(set) {
       const ro = new ResizeObserver(() => set(fogElem.offsetWidth / 2));
 
@@ -28,15 +28,15 @@
   });
 
   export function coverAll() {
-    visibleRadius = "0px";
+    visibleRadius = '0px';
   }
 
   export function coverPart() {
-    visibleRadius = "90vmin";
+    visibleRadius = '90vmin';
   }
 
   export function retract() {
-    visibleRadius = "100vmax";
+    visibleRadius = '100vmax';
   }
 </script>
 
