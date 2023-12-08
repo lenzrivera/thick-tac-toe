@@ -75,7 +75,7 @@ export class Game {
   }
 
   static genRandomCoveredTiles() {
-    const p = 0.3; // TODO
+    const p = 0.1; // TODO
     const coveredTiles = [];
 
     for (let i = 0; i < BOARD_SIZE; i++) {
@@ -197,6 +197,8 @@ export class Game {
 
   checkEndCondition(placeX, placeY) {
     const winningTiles = this.checkWinCondition(placeX, placeY);
+
+    console.log(winningTiles);
 
     if (winningTiles.length !== 0) {
       this.connection.broadcast({ name: 'game_end', args: [winningTiles] });

@@ -54,6 +54,7 @@
 
   function handleGameStart() {
     fogScreen.coverAll();
+    board.resetZoom();
     showMainModal = false;
   }
 
@@ -115,10 +116,8 @@
    * @param {boolean[][]} winningTiles
    */
   function handleGameEnd(winningTiles) {
-    console.log(winningTiles);
-
     fogScreen.retract();
-    // board.zoomOut();
+    board.zoomOut(winningTiles);
     // board.highlightTiles(winningTiles);
 
     // $store.gameServer.endConnection();

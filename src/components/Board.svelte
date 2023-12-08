@@ -14,10 +14,16 @@
    */
   let coveredTiles = null;
 
+  /**
+   * Offset from board's top-left (0, 0) to bottom-right (1, 1).
+   * @type {{x: number, y: number}}
+   */
   let panOffset = { x: 0, y: 0 };
   let panAnchor = null;
   let prevPanOffset = null;
   let panVelocity = 0;
+
+  let zoomedOut = false;
 
   $: computePanVelocity(tileContents);
 
@@ -43,12 +49,23 @@
    * @param {import('../lib/Game').TileData} tileData
    */
   export function updateTileData(tileData) {
+    // TODO: Consider using a prop instead?
     tileContents = tileData.tileContents;
     coveredTiles = tileData.coveredTiles;
   }
 
   export function setPanOffset(x, y) {
     panOffset = { x, y };
+  }
+
+  export function zoomOut(winningTiles) {
+    // The way winningTiles is computed somewhat ensures tile ordering.
+    const centerTile = winningTiles[Math.floor(winningTiles.length / 2)];
+    zoomToTile(...centerTile);
+  }
+
+  export function resetZoom() {
+    zoomedOut = false;
   }
 
   function getBoardStyle(tileContents, panOffset) {
@@ -116,14 +133,25 @@
     const dy = clientY - panAnchor.y;
 
     panOffset = {
-      x: clamp(prevPanOffset.x + dx * panVelocity, -1, 1),
-      y: clamp(prevPanOffset.y + dy * panVelocity, -1, 1),
+      x: clamp(prevPanOffset.x - dx * panVelocity, -1, 1),
+      y: clamp(prevPanOffset.y - dy * panVelocity, -1, 1),
     };
   }
 
   function handleBoardPointerUp() {
     panAnchor = null;
     prevPanOffset = null;
+  }
+
+  /* For zooming */
+
+  function zoomToTile(tileX, tileY) {
+    // TODO: Bound to only one dimension
+    const cellCount = tileContents.length;
+    const midpoint = (cellCount - 1) / 2;
+
+    setPanOffset((tileX - midpoint) / midpoint, (tileY - midpoint) / midpoint);
+    zoomedOut = true;
   }
 </script>
 
@@ -140,7 +168,7 @@
   style={getBoardStyle(tileContents, panOffset)}
   on:pointerdown={handleBoardPointerDown}
 >
-  <div class="pannable_board">
+  <div class="pannable_board" class:zoomed_out={zoomedOut}>
     {#if tileContents}
       {#each tileContents as row, y}
         {#each row as content, x}
@@ -163,6 +191,7 @@
 
 <style>
   .board {
+    --tile-size: calc(100vmin / var(--visible-tile-count));
     --visible-tile-count: 5;
 
     position: absolute;
@@ -173,16 +202,25 @@
   }
 
   .pannable_board {
+    --zoom: 1;
+
     /* Position the board's top-left corner to its container's center. */
     position: absolute;
     top: 50%;
     left: 50%;
 
-    /* Translate the board's center to its container's center + pan offset. */
-    translate: calc(-50% + var(--pan-x) * 50%) calc(-50% + var(--pan-y) * 50%);
+    translate: calc(
+        -50% - (50% - var(--tile-size) / 2) * var(--pan-x) * var(--zoom)
+      )
+      calc(-50% - (50% - var(--tile-size) / 2) * var(--pan-y) * var(--zoom));
+    scale: var(--zoom);
 
     display: grid;
     grid-template-columns: repeat(var(--grid-count), auto);
     justify-content: center;
+  }
+
+  .pannable_board.zoomed_out {
+    --zoom: 0.5;
   }
 </style>

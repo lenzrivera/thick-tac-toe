@@ -12,16 +12,14 @@
 
 <div
   class="tile"
-  class:x={content === "X"}
-  class:o={content === "O"}
+  class:x={content === 'X'}
+  class:o={content === 'O'}
   class:covered
   on:pointerup
 ></div>
 
 <style>
   .tile {
-    --tile-size: calc(100vmin / var(--visible-tile-count));
-
     position: relative;
 
     width: var(--tile-size);
@@ -42,15 +40,15 @@
   }
 
   .tile.x::before {
-    content: "X";
+    content: 'X';
   }
 
   .tile.o::before {
-    content: "O";
+    content: 'O';
   }
 
   .tile.covered::after {
-    content: "";
+    content: '';
 
     position: absolute;
     inset: 0;
