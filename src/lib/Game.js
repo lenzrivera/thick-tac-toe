@@ -19,8 +19,6 @@ export class Game {
   constructor(connection) {
     this.connection = connection;
 
-    this.done = false;
-
     this.players = Game.genPlayers(connection);
     this.currPlayerIndex = 0;
 
@@ -75,7 +73,7 @@ export class Game {
   }
 
   static genRandomCoveredTiles() {
-    const p = 0.1; // TODO
+    const p = 0; // TODO
     const coveredTiles = [];
 
     for (let i = 0; i < BOARD_SIZE; i++) {
@@ -195,20 +193,6 @@ export class Game {
     return this.tileContents.every(row => row.every(tile => tile !== null));
   }
 
-  checkEndCondition(placeX, placeY) {
-    const winningTiles = this.checkWinCondition(placeX, placeY);
-
-    console.log(winningTiles);
-
-    if (winningTiles.length !== 0) {
-      this.connection.broadcast({ name: 'game_end', args: [winningTiles] });
-      this.done = true;
-    } else if (this.checkDrawCondition()) {
-      this.connection.broadcast({ name: 'game_end' });
-      this.done = true;
-    }
-  }
-
   placeOnTile(tileX, tileY) {
     if (!Game.coordsInBounds(tileX, tileY)) {
       return;
@@ -232,8 +216,6 @@ export class Game {
           args: [tileX, tileY, this.currentSymbol],
         });
       }
-
-      this.checkEndCondition(tileX, tileY);
     } else {
       // Attempted to place on an covered occupied tile
       if (this.coveredTiles[tileY][tileX]) {
@@ -245,8 +227,20 @@ export class Game {
     }
   }
 
-  nextTurn() {
-    if (this.done) {
+  // TODO: hacky parameters not supposed to be there
+  // This method gets called before the end check completes, messing up the
+  // end check. Would require a bit of reworking to fix cleanly, so we just
+  // perform the end check here (involving the said parameter passing).
+  nextTurn(lastPlaceX, lastPlaceY) {
+    const winningTiles = this.checkWinCondition(lastPlaceX, lastPlaceY);
+
+    if (winningTiles.length !== 0) {
+      this.connection.broadcast({ name: 'game_end', args: [winningTiles] });
+      return;
+    }
+
+    if (this.checkDrawCondition()) {
+      this.connection.broadcast({ name: 'game_end' });
       return;
     }
 

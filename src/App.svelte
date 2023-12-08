@@ -95,7 +95,7 @@
    */
   function handleUncoveredTilePlace(tileX, tileY, type) {
     board.placeOnTile(tileX, tileY, type);
-    $store.gameServer.sendCommand({ name: 'nextTurn' });
+    $store.gameServer.sendCommand({ name: 'nextTurn', args: [tileX, tileY] });
   }
 
   /**
