@@ -57,6 +57,7 @@
 
   function handleGameStart() {
     fogScreen.coverAll();
+    board.setCoverShow(true);
     board.resetZoom();
     showMainModal = false;
   }
@@ -120,6 +121,7 @@
    */
   function handleGameEnd(winningTiles) {
     fogScreen.retract();
+    board.setCoverShow(false);
     board.zoomOut(winningTiles);
     // board.highlightTiles(winningTiles);
 

@@ -14,6 +14,8 @@
    */
   let coveredTiles = null;
 
+  let enableCovering = true;
+
   /**
    * Offset from board's top-left (0, 0) to bottom-right (1, 1).
    * @type {{x: number, y: number}}
@@ -66,6 +68,10 @@
 
   export function resetZoom() {
     zoomedOut = false;
+  }
+
+  export function setCoverShow(value) {
+    enableCovering = value;
   }
 
   function getBoardStyle(tileContents, panOffset) {
@@ -179,7 +185,7 @@
           -->
           <Tile
             {content}
-            covered={coveredTiles[y][x]}
+            covered={enableCovering && coveredTiles[y][x]}
             on:pointerup={({ clientX, clientY }) =>
               handleTileClick(clientX, clientY, x, y)}
           />

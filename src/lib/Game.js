@@ -8,7 +8,7 @@
  * @prop {boolean[][]} coveredTiles
  */
 
-export const BOARD_SIZE = 5;
+export const BOARD_SIZE = 15;
 const WINNING_LINE_LEN = 3;
 
 const MAX_COVER_PROBABILITY = 0.7;
