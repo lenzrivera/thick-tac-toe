@@ -120,8 +120,11 @@
     board.zoomOut(winningTiles);
     // board.highlightTiles(winningTiles);
 
-    // $store.gameServer.endConnection();
-    showMainModal = true;
+    // TODO: Relying on a fixed timeout like this is probably a bad idea.
+    setTimeout(() => {
+      $store.gameServer.endConnection();
+      showMainModal = true;
+    }, 5000);
   }
 </script>
 

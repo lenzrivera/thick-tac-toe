@@ -68,4 +68,9 @@ export class GameServer extends EventEmitter {
 
     this.callCommand(command);
   }
+
+  endConnection() {
+    this.connection.disconnect();
+    this.instance = null;
+  }
 }

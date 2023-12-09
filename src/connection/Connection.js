@@ -104,4 +104,13 @@ export class Connection extends EventEmitter {
 
     this.peer.send({ name, args: args ?? [] });
   }
+
+  disconnect() {
+    if (this.peer === null) {
+      throw new Error('Cannot disconnect nonexistent connection.');
+    }
+
+    this.peer.close();
+    this.peer = null;
+  }
 }
