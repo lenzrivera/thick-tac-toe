@@ -23,21 +23,23 @@
   onMount(() => {
     $store.gameServer.once('connection_ready', handleConnectionReady);
 
-    $store.gameServer.once('game_start', handleGameStart);
+    $store.gameServer.on('game_start', handleGameStart);
     $store.gameServer.on('game_update', handleGameUpdate);
     $store.gameServer.on('next_turn', handleNextTurn);
     $store.gameServer.on('uncovered_tile_place', handleUncoveredTilePlace);
     $store.gameServer.on('covered_tile_place', handleCoveredTilePlace);
-    $store.gameServer.once('game_end', handleGameEnd);
+    $store.gameServer.on('game_end', handleGameEnd);
 
     fogScreen.retract();
   });
 
   onDestroy(() => {
+    $store.gameServer.off('game_start', handleGameStart);
     $store.gameServer.off('game_update', handleGameUpdate);
     $store.gameServer.off('next_turn', handleNextTurn);
     $store.gameServer.off('uncovered_tile_place', handleUncoveredTilePlace);
     $store.gameServer.off('covered_tile_place', handleCoveredTilePlace);
+    $store.gameServer.off('game_end', handleGameEnd);
   });
 
   function handleConnectionReady() {

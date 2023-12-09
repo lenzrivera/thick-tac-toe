@@ -236,11 +236,26 @@ export class Game {
 
     if (winningTiles.length !== 0) {
       this.connection.broadcast({ name: 'game_end', args: [winningTiles] });
+
+      // TODO: Hacky solution to reflect the new (winning) placement to the
+      // player who did not place the tile.
+      this.connection.broadcast({
+        name: 'game_update',
+        args: [this.tileData],
+      });
+
       return;
     }
 
     if (this.checkDrawCondition()) {
       this.connection.broadcast({ name: 'game_end' });
+
+      // TODO: Likewise.
+      this.connection.broadcast({
+        name: 'game_update',
+        args: [this.tileData],
+      });
+
       return;
     }
 
