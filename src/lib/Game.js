@@ -8,9 +8,10 @@
  * @prop {boolean[][]} coveredTiles
  */
 
+export const BOARD_SIZE = 5;
 const WINNING_LINE_LEN = 3;
 
-export const BOARD_SIZE = 5;
+const MAX_COVER_PROBABILITY = 0.7;
 
 export class Game {
   /**
@@ -21,9 +22,10 @@ export class Game {
 
     this.players = Game.genPlayers(connection);
     this.currPlayerIndex = 0;
+    this.turnCount = 0;
 
     this.tileContents = Game.genTileContents();
-    this.coveredTiles = Game.genRandomCoveredTiles();
+    this.coveredTiles = this.genRandomCoveredTiles();
 
     this.connection.broadcast({ name: 'game_start' });
     this.connection.broadcast({ name: 'game_update', args: [this.tileData] });
@@ -72,8 +74,21 @@ export class Game {
     return tileContents;
   }
 
-  static genRandomCoveredTiles() {
-    const p = 0; // TODO
+  static computeCoverProbability(turnCount) {
+    const START_VALUE = 0.1;
+    const TARGET_VALUE = MAX_COVER_PROBABILITY;
+
+    // Ideally, this would be a function of BOARD_SIZE.
+    const RATE = 10;
+
+    return (
+      (TARGET_VALUE - START_VALUE) * (1 - Math.exp(-turnCount / RATE)) +
+      START_VALUE
+    );
+  }
+
+  genRandomCoveredTiles() {
+    const p = Game.computeCoverProbability(this.turnCount);
     const coveredTiles = [];
 
     for (let i = 0; i < BOARD_SIZE; i++) {
@@ -259,8 +274,10 @@ export class Game {
       return;
     }
 
+    this.turnCount += 1;
+
     this.currPlayerIndex = (this.currPlayerIndex + 1) % 2;
-    this.coveredTiles = Game.genRandomCoveredTiles();
+    this.coveredTiles = this.genRandomCoveredTiles();
 
     // Update the current player on the results of the actions of the prior
     // player + all players on the new covered tiles.
