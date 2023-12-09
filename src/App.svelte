@@ -18,6 +18,16 @@
    */
   let fogScreen;
 
+  /**
+   * To prevent additional tile placements (e.g. during animations) when a tile
+   * placement has already been made in the first place.
+   * @type {boolean}
+   */
+  let tilePlaceComplete = false;
+
+  /**
+   * @type {boolean}
+   */
   let showMainModal = false;
 
   onMount(() => {
@@ -77,6 +87,7 @@
    * @param {number} currPanYOffset
    */
   function handleNextTurn(currPlayerId, currPanXOffset, currPanYOffset) {
+    tilePlaceComplete = false;
     fogScreen.coverAll();
 
     if ($store.gameServer.selfId === currPlayerId) {
@@ -86,10 +97,16 @@
   }
 
   function handleTileClick(tileX, tileY) {
+    if (tilePlaceComplete) {
+      return;
+    }
+
     $store.gameServer.sendCommand({
       name: 'placeOnTile',
       args: [tileX, tileY],
     });
+
+    tilePlaceComplete = true;
   }
 
   /**
