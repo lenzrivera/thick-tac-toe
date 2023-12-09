@@ -25,6 +25,12 @@ export class Connection extends EventEmitter {
     this.self.once('open', this.handleOpen, this);
     // @ts-ignore
     this.self.on('connection', this.handleConnectionToSelf, this);
+
+    // Unexpected tab closing doesn't trigger any PeerJS events, so we
+    // need rely on native tab closing events instead.
+    window.addEventListener('beforeunload', () => {
+      this.send(this.peerId, { name: 'peer_close' });
+    });
   }
 
   get selfId() {

@@ -12,6 +12,10 @@ export class GameServer extends EventEmitter {
 
     this.connection.once('open', this.handleConnectionOpen, this);
     this.connection.on('message', this.handleConnectionMessage, this);
+
+    // TODO: Janky way of detecting unexpected peer closing, using the message
+    // channel that is intended for game events.
+    this.on('peer_close', this.handleConnectionClose, this);
   }
 
   get selfId() {
@@ -33,6 +37,10 @@ export class GameServer extends EventEmitter {
     }
 
     this.emit(name, ...args);
+  }
+
+  handleConnectionClose() {
+    this.emit('connection_close');
   }
 
   callCommand(command) {

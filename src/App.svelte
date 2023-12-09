@@ -22,6 +22,7 @@
 
   onMount(() => {
     $store.gameServer.once('connection_ready', handleConnectionReady);
+    $store.gameServer.on('connection_close', handleGameClose);
 
     $store.gameServer.on('game_start', handleGameStart);
     $store.gameServer.on('game_update', handleGameUpdate);
@@ -127,6 +128,13 @@
       $store.gameServer.endConnection();
       showMainModal = true;
     }, 5000);
+  }
+
+  function handleGameClose() {
+    alert('Connection with opponent was unexpectedly closed!');
+
+    fogScreen.retract();
+    showMainModal = true;
   }
 </script>
 
