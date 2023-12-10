@@ -126,7 +126,7 @@
     }
 
     await board.uncoverTile(tileX, tileY);
-    $store.gameServer.sendCommand({ name: 'nextTurn' });
+    $store.gameServer.sendCommand({ name: 'nextTurn', args: [tileX, tileY] });
   }
 
   /**
