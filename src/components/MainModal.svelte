@@ -1,4 +1,6 @@
 <script>
+  import { fade } from 'svelte/transition';
+
   export let joinLink = '';
 
   function handleJoinLinkCopy() {
@@ -6,7 +8,8 @@
   }
 </script>
 
-<div class="main_modal">
+<!-- Delay fade to get assets to load completely first.  -->
+<div class="main_modal" in:fade={{ delay: 250, duration: 1500 }}>
   <h1>thick-tac-toe</h1>
 
   <div class="join_info">
