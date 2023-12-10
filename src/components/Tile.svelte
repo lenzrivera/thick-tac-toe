@@ -25,8 +25,10 @@
     width: var(--tile-size);
     height: var(--tile-size);
 
-    background: lightgray;
-    border: 1px solid black;
+    background: #474747;
+    border: 3.5px solid #0f0f0f;
+
+    /* TODO: random border radii per tile to add a bit of flair */
   }
 
   .tile.x::before,
@@ -53,6 +55,6 @@
     position: absolute;
     inset: 0;
 
-    background-color: gray;
+    background-color: #212121;
   }
 </style>

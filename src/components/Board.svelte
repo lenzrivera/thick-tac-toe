@@ -211,6 +211,8 @@
     overflow: hidden;
 
     user-select: none;
+
+    background-color: #0f0f0f;
   }
 
   .pannable_board {
