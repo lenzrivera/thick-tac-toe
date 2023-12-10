@@ -21,13 +21,9 @@
   /**
    * To prevent additional tile placements (e.g. during animations) when a tile
    * placement has already been made in the first place.
-   * @type {boolean}
    */
   let tilePlaceComplete = false;
 
-  /**
-   * @type {boolean}
-   */
   let showMainModal = false;
 
   onMount(() => {
@@ -160,6 +156,7 @@
 <FogScreen bind:this={fogScreen}>
   <Board
     bind:this={board}
+    pannable={!tilePlaceComplete}
     on:tile_click={({ detail }) => handleTileClick(...detail)}
   />
 

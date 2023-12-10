@@ -4,6 +4,8 @@
 
   import Tile from './Tile.svelte';
 
+  export let pannable = true;
+
   /**
    * @type {?import('../lib/Game').TileContent[][]}
    */
@@ -126,6 +128,10 @@
   }
 
   function handleBoardPointerDown({ clientX, clientY }) {
+    if (!pannable) {
+      return;
+    }
+
     panAnchor = { x: clientX, y: clientY };
     prevPanOffset = { ...panOffset };
   }
