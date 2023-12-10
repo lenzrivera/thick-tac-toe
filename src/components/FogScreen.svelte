@@ -2,9 +2,8 @@
   import { setContext, tick } from 'svelte';
   import { readable } from 'svelte/store';
 
-  /**
-   * @type {string}
-   */
+  export let debugView = false;
+
   let visibleRadius = '0px';
 
   /**
@@ -45,6 +44,7 @@
 
   <div
     class="fog"
+    class:debug_view={debugView}
     style="--visible-radius: {visibleRadius};"
     bind:this={fogElem}
   ></div>
@@ -68,9 +68,12 @@
     height: var(--visible-radius);
 
     border-radius: 100%;
-    /* box-shadow: 0px 0px 0px 100vmax #11111150; */
-    box-shadow: 0px 0px 0px 100vmax #0000ff50;
+    box-shadow: 0px 0px 0px 100vmax #000000;
 
     pointer-events: none;
+  }
+
+  .fog.debug_view {
+    box-shadow: 0px 0px 0px 100vmax #0000ff50;
   }
 </style>
