@@ -1,5 +1,5 @@
 <script>
-  export let joinLink = "";
+  export let joinLink = '';
 
   function handleJoinLinkCopy() {
     navigator.clipboard.writeText(joinLink);
@@ -10,26 +10,25 @@
   <h1>thick-tac-toe</h1>
 
   <div class="join_info">
-    <p>join link:</p>
-    <input value={joinLink} readonly />
-    <button on:click={handleJoinLinkCopy}>
-      <span class="material-symbols-outlined">content_copy</span>
-    </button>
+    <p class="join_title">join link... if you dare</p>
+
+    <div class="join_link_container">
+      <input class="join_link" value={joinLink} readonly />
+
+      <button class="join_link_copy_btn" on:click={handleJoinLinkCopy}>
+        <span class="material-symbols-outlined">content_copy</span>
+      </button>
+    </div>
   </div>
 
   <div class="description">
     <p>
-      lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet, nesciunt
-      mollitia fugit explicabo, aperiam quidem officia, reiciendis distinctio
-      doloribus vitae sint perspiciatis? Vitae exercitationem quaerat eligendi
-      dolor eius cupiditate sed.
+      Tic-tac-toe... but a thick fog covers your sight and you can only see part
+      of the massive board at a time. Trust in your memory and instincts to make
+      a five-long line before your treacherous opponent.
     </p>
-    <p>
-      lorem ipsum dolor, sit amet consectetur adipisicing elit. Nostrum, maiores
-      omnis. Itaque consectetur quasi dolorem qui assumenda inventore nihil
-      aspernatur beatae repellat in debitis, porro modi laudantium eos,
-      exercitationem laborum?
-    </p>
+
+    <p>[Yes, a better description is pending.]</p>
   </div>
 </div>
 
@@ -41,24 +40,90 @@
     translate: -50% -50%;
 
     width: min(75ch, 90vw);
-    padding: 1.5rem;
+    padding: 2rem;
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
 
     color: white;
+    font-family: 'Kalnia', serif;
+    font-weight: 300;
 
-    background-color: rgba(0 0 0 / 0.5);
+    background-color: rgb(132 85 0 / 0.5);
     border-radius: 0.75vmin;
+
+    /* TODO: Ideally reflect this directly instead of using opacity. */
+    /* We need a main modal that stands out less/is darker.*/
+    opacity: 0.75;
+  }
+
+  .main_modal > h1 {
+    font-size: min(calc(2rem + 2vmin), 3rem);
   }
 
   .join_info {
-    display: grid;
-    grid-template-columns: auto minmax(0, 40ch) auto;
+    /* Allow children to expand freely within the rest of the container. */
+    width: 100%;
+
+    margin: 1rem;
+    margin-bottom: 1.75rem;
+
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    gap: 0.5rem;
+  }
+
+  .join_title {
+    font-weight: 400;
+  }
+
+  .join_link_container {
+    /* Allow children to expand freely within the rest of the container. */
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
     gap: 1rem;
+  }
+
+  .join_link {
+    flex: 1;
+    max-width: 50ch;
+
+    appearance: none;
+    padding: 0.25rem 0.5rem;
+    border: none;
+
+    color: white;
+    font-family: 'Kalnia';
+
+    background-color: #7c540a;
+    border-radius: 0.3rem 0.1rem 0.35rem 0.4rem;
+  }
+
+  .join_link:hover {
+    background-color: #895d0b;
+  }
+
+  .join_link_copy_btn {
+    width: 2.3rem;
+    height: 2.3rem;
+
+    color: white;
+
+    border: none;
+    background-color: #7c780a;
+    border-radius: 0.1rem 0.4rem 0.3rem 0.35rem;
+  }
+
+  .join_link_copy_btn:hover {
+    background-color: #9b960d;
+  }
+
+  .join_link_copy_btn:active {
+    background-color: #6a6708;
   }
 
   .description {
