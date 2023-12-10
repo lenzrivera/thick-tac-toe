@@ -38,6 +38,7 @@
     left: 50%;
     translate: -50% -50%;
 
+    font-family: 'Kalnia', serif;
     font-size: calc(0.6 * var(--tile-size));
   }
 
