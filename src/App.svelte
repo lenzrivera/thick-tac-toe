@@ -1,6 +1,8 @@
 <script>
   import { onDestroy, onMount } from 'svelte';
 
+  import { Howl } from 'howler';
+
   import { getOpponentIdFromJoinLink, resetUrl } from './connection/join_link';
   import { BOARD_SIZE } from './lib/Game';
   import { store } from './store';
@@ -9,6 +11,20 @@
   import FogScreen from './components/FogScreen.svelte';
   import MainModal from './components/MainModal.svelte';
   import { timeout } from './components/util';
+
+  // @ts-ignore
+  import coverAllSndPath from './assets/audio/cover_all.mp3';
+  // @ts-ignore
+  import revealPartSndPath from './assets/audio/reveal_part.mp3';
+  // @ts-ignore
+  import firstMoveSndPath from './assets/audio/first_move.mp3';
+
+  // TODO: There's probably a better way to do this.
+  const audio = {
+    coverAllSnd: null,
+    revealPartSnd: null,
+    firstMoveSnd: null,
+  };
 
   /**
    * @type {Board}
@@ -31,6 +47,10 @@
   let showMainModal = false;
 
   onMount(() => {
+    audio.coverAllSnd = new Howl({ src: [coverAllSndPath] });
+    audio.revealPartSnd = new Howl({ src: [revealPartSndPath] });
+    audio.firstMoveSnd = new Howl({ src: [firstMoveSndPath] });
+
     $store.gameServer.once('connection_ready', handleConnectionReady);
     $store.gameServer.on('connection_close', handleGameClose);
 
@@ -69,7 +89,7 @@
 
   function handleGameStart() {
     fogScreen.coverAllImmediately();
-    // TODO? Play bassy sound effect
+    audio.coverAllSnd.play();
 
     // Reset state from the previous game (if any).
     ownFirstMoveDone = false;
@@ -97,6 +117,8 @@
 
     if ($store.gameServer.selfId === currPlayerId) {
       board.setPanOffsetImmediately(currPanXOffset, currPanYOffset);
+
+      audio.revealPartSnd.play();
       await fogScreen.coverPart();
 
       tilePlaceComplete = false;
@@ -125,16 +147,18 @@
     if (!ownFirstMoveDone) {
       // Let the player know if they're an X or O on their first move.
       board.placeOnTile(tileX, tileY, type);
+      audio.firstMoveSnd.play();
       await timeout(2000);
 
       fogScreen.coverAllImmediately();
+      audio.coverAllSnd.play();
 
       ownFirstMoveDone = true;
     } else {
       fogScreen.coverAllImmediately();
-      board.placeOnTile(tileX, tileY, type);
+      audio.coverAllSnd.play();
 
-      // TODO? Play bassy sound effect
+      board.placeOnTile(tileX, tileY, type);
     }
 
     $store.gameServer.sendCommand({ name: 'nextTurn', args: [tileX, tileY] });
@@ -149,24 +173,29 @@
     tilePlaceComplete = true;
 
     await board.uncoverTile(tileX, tileY);
-    // TODO? Play wooshy sound effect
 
     // We cannot place on this tile.
     if (type !== null) {
       if (!ownFirstMoveDone) {
+        audio.firstMoveSnd.play();
+
         // Let the player know if they're an X or O on their first move.
         board.placeOnTile(tileX, tileY, type);
         await timeout(500);
 
         fogScreen.coverAllImmediately();
+        audio.coverAllSnd.play();
 
         ownFirstMoveDone = true;
       } else {
         fogScreen.coverAllImmediately();
-        board.placeOnTile(tileX, tileY, type);
+        audio.coverAllSnd.play();
 
-        // TODO? Play bassy sound effect
+        board.placeOnTile(tileX, tileY, type);
       }
+    } else {
+      fogScreen.coverAllImmediately();
+      audio.coverAllSnd.play();
     }
 
     $store.gameServer.sendCommand({ name: 'nextTurn', args: [tileX, tileY] });

@@ -22,6 +22,7 @@
   "dependencies": {
     "animejs": "^3.2.2",
     "eventemitter3": "^5.0.1",
+    "howler": "^2.2.4",
     "peerjs": "^1.5.1"
   }
 }
