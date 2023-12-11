@@ -19,7 +19,7 @@
   const FLASH_SYMBOL_ANIM = anime({
     targets: animProps,
     symbolColor: '#e89c0f',
-    duration: 1000,
+    duration: 1500,
     loop: 3,
     direction: 'alternate',
     easing: 'easeInExpo',
