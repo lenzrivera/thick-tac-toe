@@ -75,19 +75,6 @@
   }
 
   /**
-   * Presents the board to show a winning or drawn move.
-   * @param {[number, number][]} winningTiles
-   */
-  export async function toWinningView(winningTiles) {
-    // The way winningTiles is computed somewhat ensures tile ordering.
-    const centerTile = winningTiles[Math.floor(winningTiles.length / 2)];
-
-    await focusOnTile(...centerTile);
-    await uncoverAllTiles();
-    await highlightTiles(winningTiles);
-  }
-
-  /**
    * Readies the board for a new game.
    */
   export function resetToInitialView() {
@@ -99,7 +86,7 @@
    * @param {number} tileCol
    * @param {number} tileRow
    */
-  function focusOnTile(tileCol, tileRow) {
+  export function focusOnTile(tileCol, tileRow) {
     // TODO: Bound to only one board dimension.
     const cellCount = tileContents.length;
     const midpoint = (cellCount - 1) / 2;
@@ -121,14 +108,14 @@
     });
   }
 
-  function uncoverAllTiles() {
+  export function uncoverAllTiles() {
     return Promise.allSettled(tileComps.map(tc => tc.uncover()));
   }
 
   /**
    * @param {[number, number][]} winningTiles
    */
-  function highlightTiles(winningTiles) {
+  export function highlightTiles(winningTiles) {
     return Promise.allSettled(
       winningTiles.map(([tileCol, tileRow]) => {
         const tileComp = tileComps[tileRow * tileContents.length + tileCol];

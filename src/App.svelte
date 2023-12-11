@@ -2,6 +2,7 @@
   import { onDestroy, onMount } from 'svelte';
 
   import { getOpponentIdFromJoinLink, resetUrl } from './connection/join_link';
+  import { BOARD_SIZE } from './lib/Game';
   import { store } from './store';
 
   import Board from './components/Board.svelte';
@@ -160,18 +161,24 @@
    * @param {[number, number][]} winningTiles
    */
   async function handleGameEndWin(winningTiles) {
-    fogScreen.retract();
+    // The way winningTiles is computed somewhat ensures tile ordering.
+    const centerTile = winningTiles[Math.floor(winningTiles.length / 2)];
 
-    await board.toWinningView(winningTiles);
+    fogScreen.retract();
+    await board.focusOnTile(...centerTile);
+    await board.uncoverAllTiles();
+    await board.highlightTiles(winningTiles);
 
     $store.gameServer.endConnection();
     showMainModal = true;
   }
 
   async function handleGameEndDraw() {
-    fogScreen.retract();
+    const midpoint = (BOARD_SIZE - 1) / 2;
 
-    await board.toWinningView([]);
+    fogScreen.retract();
+    await board.focusOnTile(midpoint, midpoint);
+    await board.uncoverAllTiles();
 
     $store.gameServer.endConnection();
     showMainModal = true;
