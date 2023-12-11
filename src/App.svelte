@@ -93,8 +93,6 @@
    * @param {number} currPanYOffset
    */
   async function handleNextTurn(currPlayerId, currPanXOffset, currPanYOffset) {
-    fogScreen.coverAllImmediately();
-    // TODO? Play bassy sound effect
     await timeout(1000);
 
     if ($store.gameServer.selfId === currPlayerId) {
@@ -124,14 +122,19 @@
   async function handleUncoveredTilePlace(tileX, tileY, type) {
     tilePlaceComplete = true;
 
-    board.placeOnTile(tileX, tileY, type);
-
     if (!ownFirstMoveDone) {
       // Let the player know if they're an X or O on their first move.
+      board.placeOnTile(tileX, tileY, type);
       await timeout(2000);
-      // TODO? Play some kind of sound effect
+
+      fogScreen.coverAllImmediately();
 
       ownFirstMoveDone = true;
+    } else {
+      fogScreen.coverAllImmediately();
+      board.placeOnTile(tileX, tileY, type);
+
+      // TODO? Play bassy sound effect
     }
 
     $store.gameServer.sendCommand({ name: 'nextTurn', args: [tileX, tileY] });
@@ -148,13 +151,25 @@
     await board.uncoverTile(tileX, tileY);
     // TODO? Play wooshy sound effect
 
+    // We cannot place on this tile.
     if (type !== null) {
-      board.placeOnTile(tileX, tileY, type);
+      if (!ownFirstMoveDone) {
+        // Let the player know if they're an X or O on their first move.
+        board.placeOnTile(tileX, tileY, type);
+        await timeout(500);
+
+        fogScreen.coverAllImmediately();
+
+        ownFirstMoveDone = true;
+      } else {
+        fogScreen.coverAllImmediately();
+        board.placeOnTile(tileX, tileY, type);
+
+        // TODO? Play bassy sound effect
+      }
     }
 
     $store.gameServer.sendCommand({ name: 'nextTurn', args: [tileX, tileY] });
-
-    ownFirstMoveDone = true;
   }
 
   /**
