@@ -16,17 +16,6 @@
     symbolColor: '#000000',
   };
 
-  const FLASH_SYMBOL_ANIM = anime({
-    targets: animProps,
-    symbolColor: '#e89c0f',
-    duration: 1500,
-    loop: 3,
-    direction: 'alternate',
-    easing: 'easeInExpo',
-    autoplay: false,
-    update: () => (animProps = animProps),
-  });
-
   $: animProps.coverOpacity = covered ? 1 : 0;
 
   export function uncover() {
@@ -44,9 +33,21 @@
     });
   }
 
-  export async function flashSymbol() {
-    FLASH_SYMBOL_ANIM.play();
-    await FLASH_SYMBOL_ANIM.finished;
+  export function flashSymbol() {
+    return new Promise(resolve => {
+      // TODO: Ideally, this won't be created again and again, but the completion
+      // callback can't be set if that were the case.
+      anime({
+        targets: animProps,
+        symbolColor: '#e89c0f',
+        duration: 1500,
+        loop: 3,
+        direction: 'alternate',
+        easing: 'easeInExpo',
+        update: () => (animProps = animProps),
+        complete: resolve,
+      });
+    });
   }
 
   export function unflashSymbol() {
