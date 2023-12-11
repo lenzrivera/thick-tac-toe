@@ -299,5 +299,6 @@
     color: lightgray;
     font-family: 'Kalnia', serif;
     font-size: 1.5rem;
+    text-align: center;
   }
 </style>
