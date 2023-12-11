@@ -38,7 +38,8 @@
     $store.gameServer.on('next_turn', handleNextTurn);
     $store.gameServer.on('uncovered_tile_place', handleUncoveredTilePlace);
     $store.gameServer.on('covered_tile_place', handleCoveredTilePlace);
-    $store.gameServer.on('game_end', handleGameEnd);
+    $store.gameServer.on('game_end_win', handleGameEndWin);
+    $store.gameServer.on('game_end_draw', handleGameEndDraw);
 
     fogScreen.retract();
   });
@@ -49,7 +50,8 @@
     $store.gameServer.off('next_turn', handleNextTurn);
     $store.gameServer.off('uncovered_tile_place', handleUncoveredTilePlace);
     $store.gameServer.off('covered_tile_place', handleCoveredTilePlace);
-    $store.gameServer.off('game_end', handleGameEnd);
+    $store.gameServer.off('game_end_win', handleGameEndWin);
+    $store.gameServer.off('game_end_draw', handleGameEndDraw);
   });
 
   async function handleConnectionReady() {
@@ -157,9 +159,19 @@
   /**
    * @param {[number, number][]} winningTiles
    */
-  async function handleGameEnd(winningTiles) {
+  async function handleGameEndWin(winningTiles) {
     fogScreen.retract();
+
     await board.toWinningView(winningTiles);
+
+    $store.gameServer.endConnection();
+    showMainModal = true;
+  }
+
+  async function handleGameEndDraw() {
+    fogScreen.retract();
+
+    await board.toWinningView([]);
 
     $store.gameServer.endConnection();
     showMainModal = true;

@@ -250,7 +250,7 @@ export class Game {
     const winningTiles = this.checkWinCondition(lastPlaceX, lastPlaceY);
 
     if (winningTiles.length !== 0) {
-      this.connection.broadcast({ name: 'game_end', args: [winningTiles] });
+      this.connection.broadcast({ name: 'game_end_win', args: [winningTiles] });
 
       // TODO: Hacky solution to reflect the new (winning) placement to the
       // player who did not place the tile.
@@ -263,7 +263,7 @@ export class Game {
     }
 
     if (this.checkDrawCondition()) {
-      this.connection.broadcast({ name: 'game_end' });
+      this.connection.broadcast({ name: 'game_end_draw' });
 
       // TODO: Likewise.
       this.connection.broadcast({
