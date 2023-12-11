@@ -61,7 +61,7 @@
   }
 
   .main_modal > h1 {
-    font-size: min(calc(2rem + 2vmin), 3rem);
+    font-size: min(calc(1.6rem + 2vmin), 3rem);
   }
 
   .join_info {
