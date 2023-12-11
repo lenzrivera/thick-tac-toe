@@ -1,5 +1,6 @@
 <script>
   import { onDestroy, onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
 
   import { Howl } from 'howler';
 
@@ -25,6 +26,17 @@
     revealPartSnd: null,
     firstMoveSnd: null,
   };
+
+  /**
+   * @type {?string}
+   */
+  let opponentId = null;
+
+  /**
+   * Helps in forcing the joining player to interact with the webpage so
+   * that audio is enabled.
+   */
+  let inviteAccepted = false;
 
   /**
    * @type {Board}
@@ -76,15 +88,19 @@
   });
 
   async function handleConnectionReady() {
-    const opponentId = getOpponentIdFromJoinLink();
+    opponentId = getOpponentIdFromJoinLink();
 
-    if (opponentId) {
-      resetUrl();
-      $store.gameServer.startGame(opponentId);
-    } else {
+    if (!opponentId) {
       fogScreen.retract();
       showMainModal = true;
+    } else {
+      resetUrl();
     }
+  }
+
+  function handleInviteeMsgClick() {
+    inviteAccepted = true;
+    $store.gameServer.startGame(opponentId);
   }
 
   function handleGameStart() {
@@ -236,6 +252,20 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+{#if opponentId && !inviteAccepted}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div
+    class="invitee_msg"
+    on:click={handleInviteeMsgClick}
+    in:fade={{ duration: 1000 }}
+    out:fade={{ duration: 100 }}
+  >
+    <p>Press to enable audio and start the game...</p>
+  </div>
+{/if}
+
 <FogScreen bind:this={fogScreen}>
   <Board
     bind:this={board}
@@ -247,3 +277,21 @@
     <MainModal joinLink={$store.gameServer.joinLink} />
   {/if}
 </FogScreen>
+
+<style>
+  .invitee_msg {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .invitee_msg > p {
+    color: lightgray;
+    font-family: 'Kalnia', serif;
+    font-size: 1.5rem;
+  }
+</style>
