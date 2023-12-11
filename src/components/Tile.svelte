@@ -1,4 +1,6 @@
 <script>
+  import anime from 'animejs';
+
   /**
    * @type {import('../lib/Game').TileContent}
    */
@@ -8,17 +10,61 @@
    * @type {boolean}
    */
   export let covered;
+
+  let animProps = {
+    coverOpacity: 0,
+    symbolColor: '#000000',
+  };
+
+  const FLASH_SYMBOL_ANIM = anime({
+    targets: animProps,
+    symbolColor: '#e89c0f',
+    duration: 1000,
+    loop: 3,
+    direction: 'alternate',
+    easing: 'easeInExpo',
+    autoplay: false,
+    update: () => (animProps = animProps),
+  });
+
+  $: animProps.coverOpacity = covered ? 1 : 0;
+
+  export function uncover() {
+    return new Promise(resolve => {
+      // TODO: Ideally, this won't be created again and again, but the completion
+      // callback can't be set if that were the case.
+      anime({
+        targets: animProps,
+        coverOpacity: 0,
+        duration: 3000,
+        easing: 'easeOutExpo',
+        update: () => (animProps = animProps),
+        complete: resolve,
+      });
+    });
+  }
+
+  export async function flashSymbol() {
+    FLASH_SYMBOL_ANIM.play();
+    await FLASH_SYMBOL_ANIM.finished;
+  }
+
+  export function unflashSymbol() {
+    animProps = { ...animProps, symbolColor: '#000000' };
+  }
 </script>
 
 <div
   class="tile"
   class:x={content === 'X'}
   class:o={content === 'O'}
-  class:covered
+  style="--cover-opacity: {animProps.coverOpacity}; --symbol-color: {animProps.symbolColor};"
   on:pointerup
 ></div>
 
 <style>
+  /* TODO: --tile-size could be passed more explcitly. */
+
   .tile {
     position: relative;
 
@@ -38,6 +84,7 @@
     left: 50%;
     translate: -50% -50%;
 
+    color: var(--symbol-color);
     font-family: 'Kalnia', serif;
     font-size: calc(0.6 * var(--tile-size));
   }
@@ -50,12 +97,13 @@
     content: 'O';
   }
 
-  .tile.covered::after {
+  .tile::after {
     content: '';
 
     position: absolute;
     inset: 0;
 
     background-color: #212121;
+    opacity: var(--cover-opacity);
   }
 </style>

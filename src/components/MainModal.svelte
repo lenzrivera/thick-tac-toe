@@ -8,8 +8,7 @@
   }
 </script>
 
-<!-- Delay fade to get assets to load completely first.  -->
-<div class="main_modal" in:fade={{ delay: 250, duration: 1500 }}>
+<div class="main_modal" in:fade={{ duration: 1500 }}>
   <h1>thick-tac-toe</h1>
 
   <div class="join_info">
@@ -54,7 +53,7 @@
     font-weight: 300;
 
     background-color: rgb(132 85 0 / 0.5);
-    border-radius: 0.75vmin;
+    border-radius: 0.75vmax 0.45vmax 0.8vmax 0.3vmax;
 
     /* TODO: Ideally reflect this directly instead of using opacity. */
     /* We need a main modal that stands out less/is darker.*/

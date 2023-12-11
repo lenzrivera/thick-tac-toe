@@ -2,9 +2,13 @@
   import { setContext, tick } from 'svelte';
   import { readable } from 'svelte/store';
 
+  import anime from 'animejs';
+
   export let debugView = false;
 
-  let visibleRadius = '0px';
+  let animProps = {
+    visibleRadius: '0vmin',
+  };
 
   /**
    * @type {HTMLDivElement}
@@ -26,16 +30,44 @@
     }),
   });
 
-  export function coverAll() {
-    visibleRadius = '0px';
+  export function coverAllImmediately() {
+    animProps = { ...animProps, visibleRadius: '0vmin' };
   }
 
   export function coverPart() {
-    visibleRadius = '90vmin';
+    return new Promise(resolve => {
+      // TODO: Ideally, this won't be created again and again, but the completion
+      // callback can't be set if that were the case.
+      anime({
+        targets: animProps,
+        visibleRadius: '90vmin',
+        duration: 1500,
+        easing: 'easeOutExpo',
+        update() {
+          // Seems like a manual update is required for this to work.
+          animProps = animProps;
+        },
+        complete: resolve,
+      });
+    });
   }
 
   export function retract() {
-    visibleRadius = '100vmax';
+    return new Promise(resolve => {
+      // TODO: Ideally, this won't be created again and again, but the completion
+      // callback can't be set if that were the case.
+      anime({
+        targets: animProps,
+        visibleRadius: '100vmax',
+        duration: 1500,
+        easing: 'easeOutExpo',
+        update() {
+          // Seems like a manual update is required for this to work.
+          animProps = animProps;
+        },
+        complete: resolve,
+      });
+    });
   }
 </script>
 
@@ -45,7 +77,7 @@
   <div
     class="fog"
     class:debug_view={debugView}
-    style="--visible-radius: {visibleRadius};"
+    style="--visible-radius: {animProps.visibleRadius}"
     bind:this={fogElem}
   ></div>
 </div>

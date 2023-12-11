@@ -7,6 +7,7 @@
   import Board from './components/Board.svelte';
   import FogScreen from './components/FogScreen.svelte';
   import MainModal from './components/MainModal.svelte';
+  import { timeout } from './components/util';
 
   /**
    * @type {Board}
@@ -17,6 +18,8 @@
    * @type {FogScreen}
    */
   let fogScreen;
+
+  let ownFirstMoveDone = false;
 
   /**
    * To prevent additional tile placements (e.g. during animations) when a tile
@@ -49,7 +52,7 @@
     $store.gameServer.off('game_end', handleGameEnd);
   });
 
-  function handleConnectionReady() {
+  async function handleConnectionReady() {
     const opponentId = getOpponentIdFromJoinLink();
 
     if (opponentId) {
@@ -62,9 +65,13 @@
   }
 
   function handleGameStart() {
-    fogScreen.coverAll();
-    board.setCoverShow(true);
-    board.resetZoom();
+    fogScreen.coverAllImmediately();
+    // TODO? Play bassy sound effect
+
+    // Reset state from the previous game (if any).
+    ownFirstMoveDone = false;
+    board.resetToInitialView();
+
     showMainModal = false;
   }
 
@@ -74,7 +81,7 @@
    * @param {object} tileData
    */
   function handleGameUpdate(tileData) {
-    board.updateTileData(tileData);
+    board.updateTileDataImmediately(tileData);
   }
 
   /**
@@ -82,13 +89,16 @@
    * @param {number} currPanXOffset
    * @param {number} currPanYOffset
    */
-  function handleNextTurn(currPlayerId, currPanXOffset, currPanYOffset) {
-    tilePlaceComplete = false;
-    fogScreen.coverAll();
+  async function handleNextTurn(currPlayerId, currPanXOffset, currPanYOffset) {
+    fogScreen.coverAllImmediately();
+    // TODO? Play bassy sound effect
+    await timeout(1000);
 
     if ($store.gameServer.selfId === currPlayerId) {
-      board.setPanOffset(currPanXOffset, currPanYOffset);
-      fogScreen.coverPart();
+      board.setPanOffsetImmediately(currPanXOffset, currPanYOffset);
+      await fogScreen.coverPart();
+
+      tilePlaceComplete = false;
     }
   }
 
@@ -101,8 +111,6 @@
       name: 'placeOnTile',
       args: [tileX, tileY],
     });
-
-    tilePlaceComplete = true;
   }
 
   /**
@@ -110,8 +118,19 @@
    * @param {number} tileY
    * @param {object} type
    */
-  function handleUncoveredTilePlace(tileX, tileY, type) {
+  async function handleUncoveredTilePlace(tileX, tileY, type) {
+    tilePlaceComplete = true;
+
     board.placeOnTile(tileX, tileY, type);
+
+    if (!ownFirstMoveDone) {
+      // Let the player know if they're an X or O on their first move.
+      await timeout(2000);
+      // TODO? Play some kind of sound effect
+
+      ownFirstMoveDone = true;
+    }
+
     $store.gameServer.sendCommand({ name: 'nextTurn', args: [tileX, tileY] });
   }
 
@@ -121,28 +140,29 @@
    * @param {object} type
    */
   async function handleCoveredTilePlace(tileX, tileY, type) {
+    tilePlaceComplete = true;
+
+    await board.uncoverTile(tileX, tileY);
+    // TODO? Play wooshy sound effect
+
     if (type !== null) {
       board.placeOnTile(tileX, tileY, type);
     }
 
-    await board.uncoverTile(tileX, tileY);
     $store.gameServer.sendCommand({ name: 'nextTurn', args: [tileX, tileY] });
+
+    ownFirstMoveDone = true;
   }
 
   /**
-   * @param {boolean[][]} winningTiles
+   * @param {[number, number][]} winningTiles
    */
-  function handleGameEnd(winningTiles) {
+  async function handleGameEnd(winningTiles) {
     fogScreen.retract();
-    board.setCoverShow(false);
-    board.zoomOut(winningTiles);
-    // board.highlightTiles(winningTiles);
+    await board.toWinningView(winningTiles);
 
-    // TODO: Relying on a fixed timeout like this is probably a bad idea.
-    setTimeout(() => {
-      $store.gameServer.endConnection();
-      showMainModal = true;
-    }, 5000);
+    $store.gameServer.endConnection();
+    showMainModal = true;
   }
 
   function handleGameClose() {
