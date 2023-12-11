@@ -230,6 +230,9 @@
     await board.highlightTiles(winningTiles);
 
     $store.gameServer.endConnection();
+    opponentId = null;
+    inviteAccepted = false;
+
     showMainModal = true;
   }
 
@@ -241,6 +244,9 @@
     await board.uncoverAllTiles();
 
     $store.gameServer.endConnection();
+    opponentId = null;
+    inviteAccepted = false;
+
     showMainModal = true;
   }
 
