@@ -9,10 +9,10 @@
 </script>
 
 <div class="main_modal" in:fade={{ duration: 1500 }}>
-  <h1>thick-tac-toe</h1>
+  <h1>Thick-Tac-Toe</h1>
 
   <div class="join_info">
-    <p class="join_title">join link... if you dare</p>
+    <p class="join_title">Join Link</p>
 
     <div class="join_link_container">
       <input class="join_link" value={joinLink} readonly />
